@@ -3,12 +3,12 @@
     <el-card class="login-card">
       <h2 class="login-title">质检助手系统登录</h2>
       <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" label-position="top">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="loginForm.username" style="opacity: 0.5" placeholder="请输入用户名" />
+        <el-form-item label="用户名" prop="userAccount">
+          <el-input v-model="loginForm.userAccount" style="opacity: 0.5" placeholder="请输入账号" />
         </el-form-item>
 
-        <el-form-item label="密码" style="margin-top: 40px;" prop="password">
-          <el-input v-model="loginForm.password" style="opacity: 0.5;" type="password" placeholder="请输入密码" show-password />
+        <el-form-item label="密码" style="margin-top: 40px;" prop="userPassword">
+          <el-input v-model="loginForm.userPassword" style="opacity: 0.5;" type="password" placeholder="请输入密码" show-password />
         </el-form-item>
 
         <el-form-item prop="remember">
@@ -33,7 +33,7 @@ import { ref, reactive, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 // import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import {getUserInfo} from '../apis/api.js';
+import {postUserLogin} from '../apis/api.js';
 // import {getUserInfo} from '@/apis/api.js';
 
 
@@ -45,8 +45,8 @@ const loginFormRef = ref<FormInstance>()
 
 // 表单数据 remember可以后续做保存处理
 const loginForm = reactive({
-  username: '',
-  password: '',
+  userAccount: '',
+  userPassword: '',
   remember: false
 })
 
@@ -55,11 +55,11 @@ const loading = ref(false)
 
 // 验证规则
 const loginRules = reactive<FormRules>({
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
+  userAccount: [
+    { required: true, message: '请输入账户', trigger: 'blur' },
     { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
   ],
-  password: [
+  userPassword: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
   ]
@@ -70,7 +70,8 @@ const handleLogin = () => {
   loginFormRef.value?.validate(async (valid: any) => {
     console.log("valid:",valid)
     if(valid){
-      let res = await getUserInfo(loginForm)
+      let res = await postUserLogin(loginForm)
+      console.log(res)
       router.push('/main/chatlog')
       // router.push('/main')
     }

@@ -1,11 +1,17 @@
-import request from './request';
+import request from "./request";
 
+export function postUserLogin(data: any) {
+  const params = new URLSearchParams();
+  params.append('userAccount', data.userAccount);
+  params.append('password', data.password);
 
-
-export function getUserInfo(data: any) {
   return request({
-    url: '/api/user/getUserInfo',
-    method: 'get',
-    data
+    // url: '/api/api/user/getUserInfo',
+    url: "/user/login",
+    method: "post",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    data: params
   });
 }

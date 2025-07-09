@@ -8,7 +8,8 @@ const config: any = {
 
 const service = axios.create({
   // baseURL: config.baseApi
-  baseURL: 'http://localhost:3000'
+  // baseURL: 'http://localhost:3000'
+  baseURL: 'http://localhost:8080/api'
 })
 const NETWORK_ERR = '网络错误'
 

@@ -23,16 +23,16 @@ export default defineConfig({
       // "@": '/',
     },
   },
-  server: {
-    proxy: {
-      // 代理所有以 /api 开头的请求
-      '/api': {
-        target: 'http://localhost:3000', // 你的后端服务器地址
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '') // 可选，移除 /api 前缀
-      }
-    }
-  }
+  // server: {
+  //   proxy: {
+  //     // 代理所有以 /api 开头的请求
+  //     '/api': {
+  //       target: 'http://localhost:3000', // 你的后端服务器地址
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/api/, '') // 可选，移除 /api 前缀
+  //     }
+  //   }
+  // }
 
   // resolve: {
   //   alias: [
