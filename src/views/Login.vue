@@ -3,7 +3,7 @@
     <el-card class="login-card">
       <h2 class="login-title">质检助手系统登录</h2>
       <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" label-position="top">
-        <el-form-item label="用户名" prop="userAccount">
+        <el-form-item label="账户" prop="userAccount">
           <el-input v-model="loginForm.userAccount" style="opacity: 0.5" placeholder="请输入账号" />
         </el-form-item>
 
@@ -72,8 +72,8 @@ const handleLogin = () => {
     if(valid){
       let res = await postUserLogin(loginForm)
       console.log(res)
-      router.push('/main/chatlog')
-      // router.push('/main')
+      // router.push('/main/chatlog')
+      router.push('/main')
     }
 
     // console.log('？')

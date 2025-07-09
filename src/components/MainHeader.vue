@@ -50,6 +50,7 @@ const handleLogout = ()=>{
   .l-content {
     display: flex;
     align-items: center;
+    padding-left: 20px;
 
     .el-button {
       margin-right: 20px;
