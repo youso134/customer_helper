@@ -1,0 +1,47 @@
+import { createRouter, createWebHistory } from "vue-router";
+import type { RouteRecordRaw } from "vue-router";
+
+// 定义路由组件
+
+const routes: Array<RouteRecordRaw> = [
+  {
+    path: "/",
+    redirect: "/login",
+  },
+  {
+    path: "/login",
+    name: "login",
+    // component: () => import("@/views/Login2.vue"),
+    component: () => import("../views/Login.vue"),
+  },
+  {
+    path: "/home",
+    name: "Home",
+    component: () => import("../views/Home.vue"),
+  },
+  {
+    path: "/main",  
+    name: "main",
+    component: () => import("../views/Main.vue"),
+    children: [
+      {
+        path: "",
+        name: "",
+        component: () => import("../views/User.vue"),
+      },
+      {
+        path: "chatlog",
+        name: "chatlog",
+        component: () => import("../views/ChatLog.vue"),
+      },
+    ],
+  },
+];
+
+// 创建路由实例
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
+});
+
+export default router;
