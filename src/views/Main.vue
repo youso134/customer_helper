@@ -29,12 +29,12 @@ import { useRouter } from 'vue-router';
 const router = useRouter()
 
 onMounted(() => {
-  let res = localStorage.getItem('user')
-  // console.log(res !== null ? JSON.parse(res) : '本地没有user')
-  if (res === null) {
-    console.log('本地没有user，跳转回登录页面')
-    router.push('/login')
-  }
+  // let res = localStorage.getItem('user')
+  // // console.log(res !== null ? JSON.parse(res) : '本地没有user')
+  // if (res === null) {
+  //   console.log('本地没有user，跳转回登录页面')
+  //   router.push('/login')
+  // }
 })
 
 </script>

@@ -32,8 +32,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useRouter } from 'vue-router'
-import {loginUser} from '../apis/api.js';
-import { useUserStore } from '../stores/index.js';
+import {loginUser} from '../apis/api.ts';
+import { useUserStore } from '../stores/index.ts';
 
 
 const router = useRouter()  // 路由跳转
@@ -72,17 +72,6 @@ const handleLogin = () => {
       router.push('/main')
       console.log(localStorage.getItem('user'))
     }
-
-    // console.log('？')
-    // if (valid) {
-    //   loading.value = true
-    //   // 模拟登录过程
-    //   setTimeout(() => {
-    //     loading.value = false
-    //     ElMessage.success('登录成功 (模拟)')
-    //     console.log('登录数据:', loginForm)
-    //   }, 1500)
-    // }
   })
 }
 
