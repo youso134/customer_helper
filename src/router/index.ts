@@ -39,6 +39,11 @@ const routes: Array<RouteRecordRaw> = [
         name: "chatlog",
         component: () => import("../views/ChatLog.vue"),
       },
+      {
+        path: "allchatlog",
+        name: "allchatlog",
+        component: () => import("../views/AllChatLog.vue"),
+      },
     ],
   },
 ];

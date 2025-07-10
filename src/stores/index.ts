@@ -5,8 +5,8 @@ interface User {
   userAccount: string;
   userName: string;
   userRole: string;
-  editTime: string;
-  createTime: string;
+  editTime?: string;
+  createTime?: string;
 }
 
 export const useUserStore = defineStore("user", {

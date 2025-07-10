@@ -11,7 +11,11 @@
         </el-menu-item>
         <el-menu-item index="2" @click="handleMenu('/main/chatlog')">
           <el-icon><House /></el-icon>
-          <span>聊天记录管理</span>
+          <span>上传聊天记录</span>
+        </el-menu-item>
+        <el-menu-item index="3" @click="handleMenu('/main/allchatlog')">
+          <el-icon><House /></el-icon>
+          <span>查看全部聊天记录</span>
         </el-menu-item>
         
         <!-- <el-sub-menu index="2" style="background-color: rgba(84, 92, 100, 0.8);">
