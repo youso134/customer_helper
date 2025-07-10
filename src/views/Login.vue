@@ -20,7 +20,7 @@
             登录
           </el-button>
         </el-form-item>
-        <el-button type="warning" class="login-button" :loading="loading" >
+        <el-button type="warning" class="login-button" :loading="loading" @click="handleRegister">
             注册
         </el-button>
       </el-form>
@@ -87,6 +87,10 @@ const handleLogin = () => {
     //   }, 1500)
     // }
   })
+}
+
+const handleRegister = ()=>{
+  router.push('/register')
 }
 
 onMounted(()=>{
