@@ -31,17 +31,17 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-// import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import {postUserLogin} from '../apis/api.js';
 // import {getUserInfo} from '@/apis/api.js';
+import { useUserStore } from '../stores/index.js';
 
 
-// 路由跳转
-const router = useRouter()
 
-// 表单引用 用于校验
-const loginFormRef = ref<FormInstance>()
+const router = useRouter()  // 路由跳转
+const userStore = useUserStore()  // 用户信息
+
+const loginFormRef = ref<FormInstance>()  // 表单引用 用于校验
 
 // 表单数据 remember可以后续做保存处理
 const loginForm = reactive({
