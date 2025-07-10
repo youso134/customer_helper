@@ -12,7 +12,7 @@
         </el-form-item>
 
         <el-form-item prop="remember">
-          <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
+          <el-checkbox v-model="isRemember">记住我</el-checkbox>
         </el-form-item>
 
         <el-form-item>
@@ -32,10 +32,8 @@
 import { ref, reactive, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useRouter } from 'vue-router'
-import {postUserLogin} from '../apis/api.js';
-// import {getUserInfo} from '@/apis/api.js';
+import {loginUser} from '../apis/api.js';
 import { useUserStore } from '../stores/index.js';
-
 
 
 const router = useRouter()  // 路由跳转
@@ -43,12 +41,11 @@ const userStore = useUserStore()  // 用户信息
 
 const loginFormRef = ref<FormInstance>()  // 表单引用 用于校验
 
-// 表单数据 remember可以后续做保存处理
 const loginForm = reactive({
   userAccount: '',
   userPassword: '',
-  remember: false
 })
+const isRemember = ref(false)
 
 // 加载状态 判断是否成功
 const loading = ref(false)
@@ -69,7 +66,7 @@ const loginRules = reactive<FormRules>({
 const handleLogin = () => {
   loginFormRef.value?.validate(async (valid: any) => {
     if(valid){
-      let res:any = await postUserLogin(loginForm)
+      let res:any = await loginUser(loginForm)
       userStore.setUser(res)
       localStorage.setItem('user', JSON.stringify(res))
       router.push('/main')

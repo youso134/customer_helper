@@ -36,7 +36,7 @@
       </div>
 
       <div class="classify">
-        当前聊天记录分类为：
+        当前聊天记录分类为：{{ currentMsg.type }}
       </div>
       
     </div>
@@ -46,19 +46,22 @@
 </template>
 
 <script lang='ts' setup>
-import { ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 // import { Avatar, User } from '@element-plus/icons-vue'
-
+import {getChat} from '../apis/api'
+import type {Chat} from '../stores/types'
 
 const inputmsg = ref<string>('')
+
+// let currentMsg = reactive<Partial<Chat>>({type:'额额'}) as Chat
+let currentMsg = reactive<Chat>({type:'默认值'}) as Chat
 
 
 // 处理对话数据
 const chatList = ref<{ type: string, content: string }[]>([])
 
 
-const rawData = "C: 您好，这里是电信客服，请问有什么可以帮您？U: 我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。C: 请您先查看光猫指示灯状态，现在是什么颜色？U: 光信号灯是红色的，已经重启过还是不行。U: 你有什么方法可以解决吗？C: 这可能是光纤信号中断，请您检查下光纤线是否插好？U: 我重新插拔了光纤线，现在灯变绿色了。C: 网络恢复了吗？可以正常上网了吗？U: 可以了，网速也正常了。C: 好的，如有其他问题请随时联系我们，祝您生活愉快！"
-// const rawData = "C: 您好，这里是电信客服，请问有什么可以帮您？U: 我家网络用不了了，WiFi连不上网。C: 请您先查看光猫指示灯状态，现在是什么颜色？U: 光信号灯是红色的，已经重启过还是不行。U: 你有什么方法可以解决吗？C: 这可能是光纤信号中断，请您检查下光纤线是否插好？U: 我重新插拔了光纤线，现在灯变绿色了。C: 网络恢复了吗？可以正常上网了吗？U: 可以了，网速也正常了。C: 好的，如有其他问题请随时联系我们，祝您生活愉快！"
+const rawData = "C: 您好，这里是电信客服，请问有什么可以帮您？U: 我家网络用不了了，WiFi连不上网。C: 请您先查看光猫指示灯状态，现在是什么颜色？U: 光信号灯是红色的，已经重启过还是不行。U: 你有什么方法可以解决吗？C: 这可能是光纤信号中断，请您检查下光纤线是否插好？U: 我重新插拔了光纤线，现在灯变绿色了。C: 网络恢复了吗？可以正常上网了吗？U: 可以了，网速也正常了。C: 好的，如有其他问题请随时联系我们，祝您生活愉快！"
 
 // 解析原始数据
 const parseChatData = (rawData: string) => {
@@ -76,13 +79,27 @@ const parseChatData = (rawData: string) => {
   chatList.value = result
 }
 
+const getChatMessage = async () => {
+  const queryPara = {
+    cid:1001,
+    consumerId:101,
+    clientId:201
+  }
+
+  let res:any = await getChat(queryPara)
+  Object.assign(currentMsg, res[0]); // 合并属性到原响应式对象 防止丢失响应性
+  parseChatData(currentMsg.content || '')
+}
+
 const submitInput = (inputmsg: string) => {
   parseChatData(inputmsg)
 }
 
 
-// 初始化时解析数据
-parseChatData(rawData)
+onMounted(()=>{
+  // parseChatData(rawData)  // 初始化时解析数据
+  getChatMessage()
+})
 
 </script>
 
