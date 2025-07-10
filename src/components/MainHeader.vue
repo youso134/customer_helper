@@ -27,11 +27,15 @@
 
 <script setup name='MainHeader' lang="ts">
 import { useRouter } from 'vue-router';
+import { useUserStore } from '../stores';
 
 
 const router = useRouter()
+const userStore = useUserStore()
 
 const handleLogout = ()=>{
+  localStorage.removeItem('user')
+  userStore.clearUser()
   router.push('/')
 }
 

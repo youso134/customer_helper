@@ -68,12 +68,12 @@ const loginRules = reactive<FormRules>({
 // 登录处理
 const handleLogin = () => {
   loginFormRef.value?.validate(async (valid: any) => {
-    console.log("valid:",valid)
     if(valid){
-      let res = await postUserLogin(loginForm)
-      console.log(res)
-      // router.push('/main/chatlog')
+      let res:any = await postUserLogin(loginForm)
+      userStore.setUser(res)
+      localStorage.setItem('user', JSON.stringify(res))
       router.push('/main')
+      console.log(localStorage.getItem('user'))
     }
 
     // console.log('？')
@@ -95,6 +95,12 @@ const handleRegister = ()=>{
 
 onMounted(()=>{
   // 进入页面前先判断缓存中是否有用户数据，有就直接登录跳转别的页面，没有才进入登录页面。
+  let res:any = localStorage.getItem('user')
+  if(res !== null){
+    res = JSON.parse(res)
+    userStore.setUser(res)
+    router.push('/main')
+  }
 })
 
 

@@ -21,9 +21,20 @@
 </template>
 
 <script lang='ts' setup name='Main'>
-import { } from 'vue'
+import { onMounted } from 'vue'
 import MainAside from '../components/MainAside.vue';
 import MainHeader from '../components/MainHeader.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
+
+onMounted(() => {
+  let res = localStorage.getItem('user')
+  console.log(res !== null ? JSON.parse(res) : '本地没有user')
+  if (res === null) {
+    router.push('/login')
+  }
+})
 
 </script>
 
@@ -32,9 +43,10 @@ import MainHeader from '../components/MainHeader.vue';
   height: 100vh;
   // width: 100vw;
 
-  .el-header, .el-main{
+  .el-header,
+  .el-main {
     padding: 0;
   }
- 
+
 }
 </style>
