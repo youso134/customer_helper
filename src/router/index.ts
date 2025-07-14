@@ -11,33 +11,33 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/login",
     name: "login",
-    // component: () => import("@/views/Login2.vue"),
-    component: () => import("../views/Login.vue"),
+    component: () => import("@/views/Login.vue"),
   },
   {
     path: "/register",
     name: "register",
-    component: () => import("../views/Register.vue"),
+    component: () => import("@/views/Register.vue"),
   },
   {
     path: "/main",  
     name: "main",
-    component: () => import("../views/Main.vue"),
+    // component: () => import("../views/Main.vue"),
+    component: () => import("@/views/Main.vue"),
     children: [
       {
         path: "",
         name: "user",
-        component: () => import("../views/User.vue"),
+        component: () => import("@/views/User.vue"),
       },
       {
         path: "chatlog",
         name: "chatlog",
-        component: () => import("../views/ChatLog.vue"),
+        component: () => import("@/views/ChatLog.vue"),
       },
       {
         path: "allchatlog",
         name: "allchatlog",
-        component: () => import("../views/AllChatLog.vue"),
+        component: () => import("@/views/AllChatLog.vue"),
       },
     ],
   },

@@ -13,10 +13,14 @@
       <el-dropdown>
         <span class="el-dropdown-link">
           <img src="@/assets/images/bird.png" class="user" />
+          <span class="username">{{ userStore.user.userName }}</span>
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item>个人中心</el-dropdown-item>
+            <el-dropdown-item @click="handleUser">个人中心</el-dropdown-item>
             <el-dropdown-item @click="handleLogout">退出</el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -28,18 +32,36 @@
 <script setup name='MainHeader' lang="ts">
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../stores';
+import { onMounted } from 'vue';
 
 
 const router = useRouter()
 const userStore = useUserStore()
 
-const handleLogout = ()=>{
+
+const handleUser = () => {
+  localStorage.setItem('activeMenuIndex', '1')
+  router.push({ name: 'user' })
+}
+
+const handleLogout = () => {
   localStorage.removeItem('user')
   localStorage.removeItem('activeMenuIndex')
   userStore.clearUser()
   router.push('/')
 }
 
+
+onMounted(() => {
+  let res: any = localStorage.getItem('user')
+  if (res !== null) {
+    res = JSON.parse(res)
+    userStore.setUser(res)
+  }
+  else{
+    ElMessage.error('未读取到浏览器缓存User')
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -49,8 +71,8 @@ const handleLogout = ()=>{
   align-items: center;
   width: 100%;
   height: 60px;
-  background-color: rgba(86, 170, 222, 0.8);
-
+  background-color: #2893E5;
+  // background-color: #2B3037;
 
   .l-content {
     display: flex;
@@ -68,12 +90,29 @@ const handleLogout = ()=>{
   }
 
   .r-content {
+
+    // flex-direction: row;
+
     .el-dropdown-link {
+      display: flex;
+      align-items: center;
+
       &:hover,
       &:focus {
-        outline: none ;
+        outline: none;
         box-shadow: none;
       }
+
+      .username {
+        font-size: 16px;
+        color: #FFF;
+        margin: 10px;
+      }
+
+      .el-icon--right {
+        color: #FFF;
+      }
+
       .user {
         width: 60px;
         height: 60px;
