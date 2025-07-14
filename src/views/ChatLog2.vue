@@ -1,34 +1,39 @@
 <template>
-  <div class="container">
-    <!-- 顶部按钮区 -->
-    <div class="button-bar">
-      <el-button type="primary" @click="dialogVisible = true">✍️ 手动输入</el-button>
-      <el-button type="success" @click="uploadChat">📁 本地上传</el-button>
-      <input ref="fileInput" type="file" accept=".xls,.xlsx" style="display: none" @change="handleFileChange" />
+  <div class='container'>
+    <div class="input-container">
+      <el-input v-model="inputmsg" class="custom-textarea" :autosize="{ minRows: 5, maxRows: 5 }" type="textarea"
+        placeholder="请输入聊天记录" resize="none" />
+      <div class="button-group">
+        <el-button type="primary" @click="submitInput(inputmsg)" class="submit-btn">确定提交</el-button>
+        <el-button class="upload-btn" @click="uploadChat">本地上传</el-button>
+        <input ref="fileInput" type="file" accept=".xls,.xlsx" style="display: none" @change="handleFileChange" />
+      </div>
     </div>
 
-    <!-- 主内容区 -->
     <div class="main-content">
       <ChatDetail :chatList="chatList" :highLight="highLight" />
 
-      <!-- 右侧分类区域 -->
       <div class="classify">
         <div class="classify-section">
           <span class="label">当前聊天记录分类：</span>
-          <el-tag type="primary" size="small">{{ currentMsg.type }}</el-tag>
+          <el-tag type="info" size="small">{{ currentMsg.type }}</el-tag>
         </div>
+
         <div class="classify-section">
           <span class="label">高亮词汇：</span>
           <div class="highlight-tags">
-            <el-tag v-for="(word, index) in highLight" :key="index" type="success" size="small" effect="light" class="highlight-tag">
+            <el-tag v-for="(word, index) in highLight" :key="index" type="success" size="small" effect="light"
+              class="highlight-tag">
               {{ word }}
             </el-tag>
           </div>
         </div>
+
         <div class="classify-section">
           <span class="label">创建时间：</span>
           <span class="value">{{ formatDate(currentMsg.createTime || '') }}</span>
         </div>
+
         <div class="classify-section">
           <span class="label">编辑时间：</span>
           <span class="value">{{ formatDate(currentMsg.editTime || '') }}</span>
@@ -36,22 +41,9 @@
       </div>
     </div>
 
-    <!-- 弹出手动输入窗口 -->
-    <el-dialog v-model="dialogVisible" title="手动输入聊天记录" width="600px" :close-on-click-modal="false">
-      <el-input
-        v-model="inputmsg"
-        type="textarea"
-        :autosize="{ minRows: 8, maxRows: 12 }"
-        placeholder="请输入聊天记录（例如：C: 欢迎光临；U: 网络不好）" resize="none"
-      />
-      <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitAndClose">提交</el-button>
-      </template>
-    </el-dialog>
   </div>
-</template>
 
+</template>
 
 <script lang='ts' setup>
 import { onMounted, reactive, ref } from 'vue'
@@ -62,9 +54,6 @@ import ChatDetail from '../components/ChatDetail.vue'
 import * as XLSX from 'xlsx'
 
 const inputmsg = ref<string>('')
-const dialogVisible = ref(false)
-
-
 
 let currentMsg = reactive<Chat>({ type: '默认值' }) as Chat
 
@@ -122,12 +111,7 @@ const readExcel = (file: File): Promise<any[][]> => {
     reader.readAsArrayBuffer(file)
   })
 }
-// 关闭弹出窗口
-const submitAndClose = () => {
-  // 这里还有要加的东西，要将用户的输入传到后端，让后端判断出分类等词汇后传回前端。 本地上传也需要这一步  这里可以加一个选项：上传后自动判断
-  parseChatData(inputmsg.value)
-  dialogVisible.value = false
-}
+
 const getChatMessage = async () => {
   const queryPara = {
     cid: 1001,
@@ -141,7 +125,9 @@ const getChatMessage = async () => {
 
   parseChatData(currentMsg.content || '')
 }
-
+const submitInput = (inputmsg: string) => {
+  parseChatData(inputmsg)
+}
 const uploadChat = () => {
   fileInput.value?.click()
 }
@@ -190,38 +176,94 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .container {
-  padding: 30px;
   display: flex;
+  height: 100vh;
+  max-height: 100vh;
   flex-direction: column;
-  // align-items: center;
+  // justify-content: center;
+  align-items: center;
+  padding: 20px;
 
-  .button-bar {
+  .input-container {
     width: 800px;
-    display: flex;
-    justify-content: flex-start;
-    gap: 15px;
     margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+
+    .custom-textarea {
+      width: 100%;
+      margin-bottom: 15px;
+
+      .el-textarea__inner {
+        font-size: 14px;
+        line-height: 1.5;
+        border-radius: 4px;
+        transition: border-color 0.3s;
+
+        &:focus {
+          border-color: #409eff;
+          outline: none;
+        }
+      }
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+
+      .submit-btn {
+        background-color: #409eff;
+        border-color: #409eff;
+
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+
+      .upload-btn {
+        background-color: #67c23a;
+        border-color: #67c23a;
+
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
   }
 
   .main-content {
     display: flex;
     width: 100%;
-    max-width: 1000px;
-    margin-top: 20px;
 
     .classify {
-      width: 35%;
+      padding: 15px;
+      width: 40%;
+      height: 500px;
       margin-left: 20px;
-      padding: 20px;
-      background-color: #f9f9f9;
+      border: 1px solid #ebeef5;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      // background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 16px;
 
       .classify-section {
-        margin-bottom: 16px;
+        font-size: 14px;
+        color: #333;
 
         .label {
-          font-weight: 600;
+          font-weight: 500;
+          color: #000000;
+          margin-right: 5px;
+        }
+
+        .value {
+          color: #222;
         }
 
         .highlight-tags {
@@ -239,6 +281,6 @@ onMounted(() => {
   }
 
 
-}
 
+}
 </style>

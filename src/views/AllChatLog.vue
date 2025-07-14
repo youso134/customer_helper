@@ -1,172 +1,104 @@
 <template>
-  <div class='container'>
+  <div class="container">
+    <!-- 搜索区域 -->
+    <div class="search">
+      <!-- 搜索框 -->
+      <el-input v-model="searchText" placeholder="请输入关键字搜索" clearable class="search-input" />
 
-    <div class="main-content">
-      <div class="chatDetail">
-        <el-scrollbar height="450px">
-          <div v-for="(item, index) in chatList" :key="index" class="message-item"
-            :class="{ 'customer': item.type === 'U', 'service': item.type === 'C' }">
-
-            <div class="avatar">
-              <el-avatar v-if="item.type === 'C'" style="background-color: #87CEFA">
-                <el-icon>
-                  <Service />
-                </el-icon>
-              </el-avatar>
-              <el-avatar v-else style="background-color: #67c23a">
-                <el-icon>
-                  <UserFilled />
-                </el-icon>
-              </el-avatar>
-            </div>
-            <div class="content">
-              <div class="name">{{ item.type === 'C' ? '客服' : '顾客' }}</div>
-              <el-card shadow="hover" class="message-card">
-                {{ item.content }}
-              </el-card>
-            </div>
-          </div>
-        </el-scrollbar>
-      </div>
-
-      <div class="classify">
-        当前聊天记录分类为：
+      <!-- 分类筛选 -->
+      <div class="filter-category">
+        <el-select v-model="selectedCategory" placeholder="请选择分类" clearable>
+          <el-option v-for="cat in categoryOptions" :key="cat" :label="cat" :value="cat" />
+        </el-select>
       </div>
       
+      <el-button type="primary" @click="handleSearch">Search</el-button>
     </div>
 
-
+    <!-- 内容展示区域 -->
+    <div class="content">
+      <el-table :data="filteredData" style="width: 100%">
+        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="name" label="名称" />
+        <el-table-column prop="message" label="消息内容" />
+        <el-table-column prop="category" label="分类" />
+      </el-table>
+    </div>
   </div>
 </template>
 
-<script lang='ts' setup>
-import { ref } from 'vue'
-// import { Avatar, User } from '@element-plus/icons-vue'
+<script lang="ts" setup name="AllChatLog">
+import { ref, computed, onMounted } from 'vue'
 
+// 原始数据
+const rawData = ref([
+  { id: 1, name: 'Alice', message: '你好，这是第一条消息', category: '技术' },
+  { id: 2, name: 'Bob', message: '第二条聊天记录在这里', category: '生活' },
+  { id: 3, name: 'Charlie', message: '这是另一条信息', category: '技术' },
+  { id: 4, name: 'David', message: '周末计划安排', category: '娱乐' },
+])
 
+// 搜索关键词和分类选中项
+const searchText = ref('')   // 现在是在name和message中一起搜索
+const selectedCategory = ref('')
 
+// 所有分类选项（也可以动态生成）
+const categoryOptions = Array.from(new Set(rawData.value.map(item => item.category)))
 
-// 处理对话数据
-const chatList = ref<{ type: string, content: string }[]>([])
+// 过滤逻辑
+// const filteredData = computed(() => {
+//   return rawData.value.filter((item) => {
+//     const matchSearch =
+//       item.name.toLowerCase().includes(searchText.value.toLowerCase()) ||
+//       item.message.toLowerCase().includes(searchText.value.toLowerCase())
 
+//     const matchCategory =
+//       !selectedCategory.value || item.category === selectedCategory.value
 
-const rawData = "C: 您好，这里是电信客服，请问有什么可以帮您？U: 我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。我家网络用不了了，WiFi连不上网。C: 请您先查看光猫指示灯状态，现在是什么颜色？U: 光信号灯是红色的，已经重启过还是不行。U: 你有什么方法可以解决吗？C: 这可能是光纤信号中断，请您检查下光纤线是否插好？U: 我重新插拔了光纤线，现在灯变绿色了。C: 网络恢复了吗？可以正常上网了吗？U: 可以了，网速也正常了。C: 好的，如有其他问题请随时联系我们，祝您生活愉快！"
-// const rawData = "C: 您好，这里是电信客服，请问有什么可以帮您？U: 我家网络用不了了，WiFi连不上网。C: 请您先查看光猫指示灯状态，现在是什么颜色？U: 光信号灯是红色的，已经重启过还是不行。U: 你有什么方法可以解决吗？C: 这可能是光纤信号中断，请您检查下光纤线是否插好？U: 我重新插拔了光纤线，现在灯变绿色了。C: 网络恢复了吗？可以正常上网了吗？U: 可以了，网速也正常了。C: 好的，如有其他问题请随时联系我们，祝您生活愉快！"
+//     return matchSearch && matchCategory
+//   })
+// })
+let filteredData = ref()
 
-// 解析原始数据
-const parseChatData = (rawData: string) => {
-  // 使用正则表达式分割，匹配 "C:" 或 "U:" 开头的内容
-  const pattern = /([CU]):\s([^CU]*)/g
-  let match
-  const result = []
-
-  while ((match = pattern.exec(rawData)) !== null) {
-    result.push({
-      type: match[1],
-      content: match[2].trim()
-    })
-  }
-  chatList.value = result
+const handleSearch = () => {
+  filteredData.value = rawData.value.filter((item) => {
+    const matchSearch =
+      item.name.toLowerCase().includes(searchText.value.toLowerCase()) ||
+      item.message.toLowerCase().includes(searchText.value.toLowerCase())
+    const matchCategory =
+      !selectedCategory.value || item.category === selectedCategory.value
+    return matchSearch && matchCategory
+  })
 }
 
-
-// 初始化时解析数据
-parseChatData(rawData)
-
+onMounted(() => {
+  filteredData.value = rawData.value
+})
 </script>
 
 <style scoped lang="scss">
 .container {
-  display: flex;
-  height: 100vh;
-  max-height: 100vh;
-  flex-direction: column;
-  // justify-content: center;
-  align-items: center;
-  padding: 20px;
-
-  .inputmsg {
+  .search {
+    height: 60px;
+    width: 500px;
+    margin: 20px;
     display: flex;
-    height: 150px;
-    margin-bottom: 20px;
+    align-items: center;
+    gap: 20px;
 
-    .el-button {
-      margin: auto 50px;
+    .search-input {
+      flex: 1;
+    }
+
+    .filter-category {
+      width: 200px;
     }
   }
 
-  .main-content {
-    display: flex;
-    width: 100%;
-
-    .chatDetail {
-      width: 60%;
-      max-height: 500px;
-      margin-bottom: 20px;
-      margin-right: 20px;
-      padding: 15px;
-
-      border: 1px solid #ebeef5;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-    }
-
-    .classify {
-      width: 40%;
-      margin: 0;
-      padding: 15px;
-
-      border: 1px solid #ebeef5;
-      border-radius: 8px;
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
-    }
-  }
-
-
-
-
-  .message-item {
-    display: flex;
-    margin-bottom: 20px;
-
-    &.customer {
-      flex-direction: row-reverse;
-
-      .content {
-        align-items: flex-end;
-      }
-
-      .message-card {
-        background-color: #f0f9eb;
-      }
-    }
-
-    &.service {
-      .message-card {
-        background-color: #f4f4f5;
-      }
-    }
-
-    .avatar {
-      margin: 0 15px;
-    }
-
-    .content {
-      display: flex;
-      flex-direction: column;
-      max-width: 70%;
-
-      .name {
-        font-size: 12px;
-        color: #090a0c;
-        margin-bottom: 5px;
-      }
-
-      .message-card {
-        border: none;
-        border-radius: 8px;
-      }
-    }
+  .content {
+    height: 600px;
+    margin: 20px;
+    overflow: auto;
   }
 }
 </style>

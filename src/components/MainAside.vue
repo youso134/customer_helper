@@ -1,5 +1,8 @@
 <template>
   <el-aside :class="{ collapsed: isCollapse }">
+    <div>
+      <h3 class="mb-2">聊天信息管理系统</h3>
+    </div>
     <div class="toggle-btn" @click="isCollapse = !isCollapse">
       <el-icon>
         <component :is="isCollapse ? Expand : Fold" />
@@ -8,7 +11,7 @@
 
     <el-menu active-text-color="rgb(107, 178, 248)" :collapse="isCollapse" :default-active="currentAside"
       text-color="#fff" @open="handleOpen" @close="handleClose">
-      <h3 class="mb-2">系统</h3>
+
 
       <el-menu-item index="1" @click="handleMenu('/main', '1')">
         <el-icon>
@@ -16,17 +19,17 @@
         </el-icon>
         <span>个人信息</span>
       </el-menu-item>
-      <el-menu-item index="2" @click="handleMenu('/main/chatlog', '2')">
+      <el-menu-item index="2" @click="handleMenu('/main/allchatlog', '2')">
         <el-icon>
-          <House />
-        </el-icon>
-        <span>上传聊天记录</span>
-      </el-menu-item>
-      <el-menu-item index="3" @click="handleMenu('/main/allchatlog', '3')">
-        <el-icon>
-          <House />
+          <Document />
         </el-icon>
         <span>查看全部聊天记录</span>
+      </el-menu-item>
+      <el-menu-item index="3" @click="handleMenu('/main/chatlog', '3')">
+        <el-icon>
+          <UploadFilled />
+        </el-icon>
+        <span>上传聊天记录</span>
       </el-menu-item>
     </el-menu>
   </el-aside>
@@ -54,18 +57,38 @@ const handleClose = (key: string, keyPath: string[]) => {
   // console.log(key, keyPath)
 }
 
-onMounted(() => {
+const checkMenu = () => {
   const savedIndex = localStorage.getItem('activeMenuIndex')
+  console.log(savedIndex)
   if (savedIndex) {
     currentAside.value = savedIndex
   } else {
     // 根据路径自动匹配一次
     const path = router.currentRoute.value.path
-    if (path.includes('/main/chatlog')) currentAside.value = '2'
-    else if (path.includes('/main/allchatlog')) currentAside.value = '3'
+    if (path.includes('/main/allchatlog')) currentAside.value = '2'
+    else if (path.includes('/main/chatlog')) currentAside.value = '3'
     else currentAside.value = '1'
   }
+}
+
+
+onMounted(() => {
+  checkMenu()
+  // const savedIndex = localStorage.getItem('activeMenuIndex')
+  // console.log(savedIndex)
+  // if (savedIndex) {
+  //   currentAside.value = savedIndex
+  // } else {
+  //   // 根据路径自动匹配一次
+  //   const path = router.currentRoute.value.path
+  //   if (path.includes('/main/chatlog')) currentAside.value = '2'
+  //   else if (path.includes('/main/allchatlog')) currentAside.value = '3'
+  //   else currentAside.value = '1'
+  // }
 })
+// onActivated(()=>{
+//   checkMenu()
+// })
 
 </script>
 
@@ -73,13 +96,22 @@ onMounted(() => {
 <style scoped lang="scss">
 .el-aside {
   height: 100vh;
-  background-color: rgba(84, 92, 100, 0.8);
+  background-color: #2B3037;
   transition: width 0.3s;
   overflow: hidden;
 
   width: 200px;
+
   &.collapsed {
     width: 64px;
+  }
+
+  .mb-2 {
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    color: #9be0e3;
+    background-color: #B37547;
   }
 
   .el-menu {
@@ -89,17 +121,20 @@ onMounted(() => {
     max-width: 100%;
     overflow: hidden;
 
+    .el-menu-item {
+      &.is-active {
+        background-color: #202329;
+      }
+    }
+
+
+
     .el-menu-item:hover {
-      background-color: #5c99ea !important;
+      background-color: #719ed9 !important;
     }
   }
 
-  .mb-2 {
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    color: #9be0e3;
-  }
+
 
   .toggle-btn {
     height: 40px;
@@ -108,7 +143,6 @@ onMounted(() => {
     justify-content: center;
     color: white;
     cursor: pointer;
-    border-bottom: 1px solid #ddd;
   }
 }
 </style>
