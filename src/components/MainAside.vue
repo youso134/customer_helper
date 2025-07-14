@@ -1,6 +1,5 @@
 <template>
   <el-aside :class="{ collapsed: isCollapse }">
-    <!-- <el-col :span="24"> -->
     <div class="toggle-btn" @click="isCollapse = !isCollapse">
       <el-icon>
         <component :is="isCollapse ? Expand : Fold" />
@@ -30,7 +29,6 @@
         <span>查看全部聊天记录</span>
       </el-menu-item>
     </el-menu>
-    <!-- </el-col> -->
   </el-aside>
 </template>
 
@@ -90,14 +88,6 @@ onMounted(() => {
     overflow: hidden; // 防止菜单内容溢出
     max-width: 100%;
     overflow: hidden;
-
-    .el-menu-item {
-      white-space: nowrap;
-      /* 防止换行撑高 */
-      overflow: hidden;
-      text-overflow: ellipsis;
-      /* 文字溢出显示省略号 */
-    }
 
     .el-menu-item:hover {
       background-color: #5c99ea !important;

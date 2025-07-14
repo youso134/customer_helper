@@ -5,7 +5,6 @@
 <script setup lang="ts" name="App">
 </script>
 
-
 <style>
 body{
   background-color: #36d0aa;
