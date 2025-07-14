@@ -36,7 +36,6 @@ import { useRouter } from 'vue-router'
 import { loginUser } from '../apis/api.ts';
 import { useUserStore } from '../stores/index.ts';
 
-
 const router = useRouter()  // 路由跳转
 const userStore = useUserStore()  // 用户信息
 
@@ -69,9 +68,11 @@ const handleLogin = () => {
     if (valid) {
       loading.value = true
       try {
+        
         let res: any = await loginUser(loginForm)
         if (res && res.userAccount) {
           userStore.setUser(res)
+          // localStorage.setItem('user', userStore.user)
           localStorage.setItem('user', JSON.stringify(res))
           router.push('/main')
         }
@@ -83,7 +84,6 @@ const handleLogin = () => {
       } finally {
         loading.value = false
       }
-      // console.log(localStorage.getItem('user'))
     }
   })
 }

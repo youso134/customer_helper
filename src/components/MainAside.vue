@@ -1,7 +1,13 @@
 <template>
   <el-aside :class="{ collapsed: isCollapse }">
-    <div>
-      <h3 class="mb-2">聊天信息管理系统</h3>
+    <div class="top-info">
+      <el-icon :size="30" color="#FFF">
+        <Shop />
+      </el-icon>
+      <!-- <h3 class="mb-2" v-show="!isCollapse">聊天信息管理系统</h3> -->
+      <transition name="fade-slide">
+        <h3 class="mb-2" v-if="!isCollapse">聊天信息管理系统</h3>
+      </transition>
     </div>
     <div class="toggle-btn" @click="isCollapse = !isCollapse">
       <el-icon>
@@ -11,7 +17,6 @@
 
     <el-menu active-text-color="rgb(107, 178, 248)" :collapse="isCollapse" :default-active="currentAside"
       text-color="#fff" @open="handleOpen" @close="handleClose">
-
 
       <el-menu-item index="1" @click="handleMenu('/main', '1')">
         <el-icon>
@@ -59,7 +64,6 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 const checkMenu = () => {
   const savedIndex = localStorage.getItem('activeMenuIndex')
-  console.log(savedIndex)
   if (savedIndex) {
     currentAside.value = savedIndex
   } else {
@@ -106,13 +110,36 @@ onMounted(() => {
     width: 64px;
   }
 
-  .mb-2 {
+  .top-info {
+    display: flex;
     height: 60px;
-    line-height: 60px;
-    text-align: center;
-    color: #9be0e3;
-    background-color: #B37547;
+    // background-color: #2893E5;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+
+
+    .fade-slide-enter-active,
+    .fade-slide-leave-active {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .fade-slide-enter-from,
+    .fade-slide-leave-to {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+
+    .mb-2 {
+      line-height: 60px;
+      text-align: center;
+      color: #9be0e3;
+
+      white-space: nowrap; // 防止换行
+    }
   }
+
+
 
   .el-menu {
     background-color: transparent;
@@ -127,14 +154,10 @@ onMounted(() => {
       }
     }
 
-
-
     .el-menu-item:hover {
       background-color: #719ed9 !important;
     }
   }
-
-
 
   .toggle-btn {
     height: 40px;

@@ -3,7 +3,7 @@
     <!-- 搜索区域 -->
     <div class="search">
       <!-- 搜索框 -->
-      <el-input v-model="searchText" placeholder="请输入关键字搜索" clearable class="search-input" />
+      <el-input v-model="searchText" placeholder="请输入关键字搜索" clearable class="search-input" /> 
 
       <!-- 分类筛选 -->
       <div class="filter-category">
@@ -11,7 +11,7 @@
           <el-option v-for="cat in categoryOptions" :key="cat" :label="cat" :value="cat" />
         </el-select>
       </div>
-      
+
       <el-button type="primary" @click="handleSearch">Search</el-button>
     </div>
 

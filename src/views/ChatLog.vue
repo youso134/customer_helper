@@ -4,6 +4,7 @@
     <div class="button-bar">
       <el-button type="primary" @click="dialogVisible = true">✍️ 手动输入</el-button>
       <el-button type="success" @click="uploadChat">📁 本地上传</el-button>
+      <el-checkbox v-model="checked2">上传后自动解析</el-checkbox>
       <input ref="fileInput" type="file" accept=".xls,.xlsx" style="display: none" @change="handleFileChange" />
     </div>
 
@@ -61,23 +62,19 @@ import type { Chat } from '../stores/types'
 import ChatDetail from '../components/ChatDetail.vue'
 import * as XLSX from 'xlsx'
 
-const inputmsg = ref<string>('')
-const dialogVisible = ref(false)
-
-
-
-let currentMsg = reactive<Chat>({ type: '默认值' }) as Chat
-
-// const rawData = "C: 您好，这里是电信客服，请问有什么可以帮您？U: 我家网络用不了了，WiFi连不上网。C: 请您先查看光猫指示灯状态，现在是什么颜色？U: 光信号灯是红色的，已经重启过还是不行。U: 你有什么方法可以解决吗？C: 这可能是光纤信号中断，请您检查下光纤线是否插好？U: 我重新插拔了光纤线，现在灯变绿色了。C: 网络恢复了吗？可以正常上网了吗？U: 可以了，网速也正常了。C: 好的，如有其他问题请随时联系我们，祝您生活愉快！"
-
 interface ChatItem {
   type: 'C' | 'U'  // 明确指定只能是这两种值
   content: string
 }
 
+const inputmsg = ref<string>('')
+const dialogVisible = ref(false)
+let currentMsg = reactive<Chat>({ type: '默认值' }) as Chat
+// const rawData = "C: 您好，这里是电信客服，请问有什么可以帮您？U: 我家网络用不了了，WiFi连不上网。C: 请您先查看光猫指示灯状态，现在是什么颜色？U: 光信号灯是红色的，已经重启过还是不行。U: 你有什么方法可以解决吗？C: 这可能是光纤信号中断，请您检查下光纤线是否插好？U: 我重新插拔了光纤线，现在灯变绿色了。C: 网络恢复了吗？可以正常上网了吗？U: 可以了，网速也正常了。C: 好的，如有其他问题请随时联系我们，祝您生活愉快！"
 const chatList = ref<ChatItem[]>([])
 const highLight = ref<string[]>([])
 const fileInput = ref<HTMLInputElement | null>(null)
+const checked2 = ref()
 
 
 // 解析原始数据
@@ -183,7 +180,6 @@ const handleFileChange = async (event: Event) => {
 
 onMounted(() => {
   getChatMessage()
-  console.log(currentMsg)
 })
 
 </script>

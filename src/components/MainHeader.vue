@@ -13,7 +13,7 @@
       <el-dropdown>
         <span class="el-dropdown-link">
           <img src="@/assets/images/bird.png" class="user" />
-          <span class="username">用户1</span>
+          <span class="username">{{ userStore.user.userName }}</span>
           <el-icon class="el-icon--right">
             <arrow-down />
           </el-icon>
@@ -32,6 +32,7 @@
 <script setup name='MainHeader' lang="ts">
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../stores';
+import { onMounted } from 'vue';
 
 
 const router = useRouter()
@@ -50,6 +51,17 @@ const handleLogout = () => {
   router.push('/')
 }
 
+
+onMounted(() => {
+  let res: any = localStorage.getItem('user')
+  if (res !== null) {
+    res = JSON.parse(res)
+    userStore.setUser(res)
+  }
+  else{
+    ElMessage.error('未读取到浏览器缓存User')
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -59,7 +71,8 @@ const handleLogout = () => {
   align-items: center;
   width: 100%;
   height: 60px;
-  background-color: #2B3037;
+  background-color: #2893E5;
+  // background-color: #2B3037;
 
   .l-content {
     display: flex;
@@ -77,7 +90,7 @@ const handleLogout = () => {
   }
 
   .r-content {
-    
+
     // flex-direction: row;
 
     .el-dropdown-link {
@@ -95,7 +108,8 @@ const handleLogout = () => {
         color: #FFF;
         margin: 10px;
       }
-      .el-icon--right{
+
+      .el-icon--right {
         color: #FFF;
       }
 
