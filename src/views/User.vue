@@ -217,6 +217,9 @@ export default {
     this.tempInfo = JSON.parse(JSON.stringify(this.userInfo));
   }
 };
+
+
+
 </script>
 
 <style scoped lang="scss">
