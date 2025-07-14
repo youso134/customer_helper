@@ -17,7 +17,8 @@
 
     <el-scrollbar class="chat-scrollbar" v-if="!isEmpty">
       <div v-for="(item, index) in chatList" :key="index" class="message-item"
-        :class="{ 'customer': item.type === 'U', 'service': item.type === 'C' }">
+        :class="item.type === 'U' ? 'customer' : 'service'">
+        <!-- :class="{ 'customer': item.type === 'U', 'service': item.type === 'C' }"> -->
         <div class="avatar">
           <el-avatar v-if="item.type === 'C'" style="background-color: #87CEFA">
             <el-icon>

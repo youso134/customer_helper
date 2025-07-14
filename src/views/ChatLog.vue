@@ -202,7 +202,7 @@ onMounted(() => {
   .main-content {
     display: flex;
     width: 100%;
-    max-width: 1000px;
+    // max-width: 1000px;
     margin-top: 20px;
 
     .classify {
