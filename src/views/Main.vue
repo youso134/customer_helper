@@ -29,6 +29,14 @@ import { useRouter } from 'vue-router';
 const router = useRouter()
 
 onMounted(() => {
+  const savedIndex = localStorage.getItem('activeMenuIndex')
+  if(savedIndex === '2'){
+    router.push({ name: 'chatlog' })
+  }else if(savedIndex === '3') {
+    // router.push('/main/allchatlog')
+    router.push({ name: 'allchatlog' })
+  }
+
   // let res = localStorage.getItem('user')
   // // console.log(res !== null ? JSON.parse(res) : '本地没有user')
   // if (res === null) {
