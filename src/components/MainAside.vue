@@ -1,69 +1,36 @@
 <template>
-  <el-aside>
-    <el-col :span="24">
-      <div class="toggle-btn" @click="isCollapse = !isCollapse">
+  <el-aside :class="{ collapsed: isCollapse }">
+    <!-- <el-col :span="24"> -->
+    <div class="toggle-btn" @click="isCollapse = !isCollapse">
+      <el-icon>
+        <component :is="isCollapse ? Expand : Fold" />
+      </el-icon>
+    </div>
+
+    <el-menu active-text-color="rgb(107, 178, 248)" :collapse="isCollapse" :default-active="currentAside"
+      text-color="#fff" @open="handleOpen" @close="handleClose">
+      <h3 class="mb-2">系统</h3>
+
+      <el-menu-item index="1" @click="handleMenu('/main', '1')">
         <el-icon>
-          <component :is="isCollapse ? Expand : Fold" />
+          <House />
         </el-icon>
-      </div>
-
-      <el-menu active-text-color="rgb(107, 178, 248)" :collapse="isCollapse" :default-active="currentAside"
-        text-color="#fff" @open="handleOpen" @close="handleClose">
-        <h3 class="mb-2">系统</h3>
-
-        <el-menu-item index="1" @click="handleMenu('/main', '1')">
-          <el-icon>
-            <House />
-          </el-icon>
-          <span>个人信息</span>
-        </el-menu-item>
-        <el-menu-item index="2" @click="handleMenu('/main/chatlog', '2')">
-          <el-icon>
-            <House />
-          </el-icon>
-          <span>上传聊天记录</span>
-        </el-menu-item>
-        <el-menu-item index="3" @click="handleMenu('/main/allchatlog', '3')">
-          <el-icon>
-            <House />
-          </el-icon>
-          <span>查看全部聊天记录</span>
-        </el-menu-item>
-
-        <!-- <el-sub-menu index="2" style="background-color: rgba(84, 92, 100, 0.8);">
-          <template #title>
-            <el-icon>
-              <location />
-            </el-icon>
-            <span>Navigator One</span>
-          </template>
-<el-menu-item-group title="Group One">
-  <el-menu-item index="1-1">item one</el-menu-item>
-  <el-menu-item index="1-2">item two</el-menu-item>
-</el-menu-item-group>
-<el-menu-item-group title="Group Two">
-  <el-menu-item index="1-3">item three</el-menu-item>
-</el-menu-item-group>
-<el-sub-menu index="1-4">
-  <template #title>item four</template>
-  <el-menu-item index="1-4-1">item one</el-menu-item>
-</el-sub-menu>
-</el-sub-menu>
-
-<el-menu-item index="3" disabled>
-  <el-icon>
-    <document />
-  </el-icon>
-  <span>Navigator Three</span>
-</el-menu-item>
-<el-menu-item index="4">
-  <el-icon>
-    <setting />
-  </el-icon>
-  <span>Navigator Four</span>
-</el-menu-item> -->
-      </el-menu>
-    </el-col>
+        <span>个人信息</span>
+      </el-menu-item>
+      <el-menu-item index="2" @click="handleMenu('/main/chatlog', '2')">
+        <el-icon>
+          <House />
+        </el-icon>
+        <span>上传聊天记录</span>
+      </el-menu-item>
+      <el-menu-item index="3" @click="handleMenu('/main/allchatlog', '3')">
+        <el-icon>
+          <House />
+        </el-icon>
+        <span>查看全部聊天记录</span>
+      </el-menu-item>
+    </el-menu>
+    <!-- </el-col> -->
   </el-aside>
 </template>
 
@@ -108,16 +75,29 @@ onMounted(() => {
 <style scoped lang="scss">
 .el-aside {
   height: 100vh;
-  // width: 200px;
   background-color: rgba(84, 92, 100, 0.8);
   transition: width 0.3s;
+  overflow: hidden;
+
+  width: 200px;
+  &.collapsed {
+    width: 64px;
+  }
 
   .el-menu {
-    // height: 100vh;
-    height: calc(100vh - 20px);
-    // background-color: rgba(84, 92, 100, 0.8); 
     background-color: transparent;
-    width: 100%;
+    height: 100%; // 占满父容器高度
+    overflow: hidden; // 防止菜单内容溢出
+    max-width: 100%;
+    overflow: hidden;
+
+    .el-menu-item {
+      white-space: nowrap;
+      /* 防止换行撑高 */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* 文字溢出显示省略号 */
+    }
 
     .el-menu-item:hover {
       background-color: #5c99ea !important;
