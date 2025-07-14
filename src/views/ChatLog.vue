@@ -5,7 +5,8 @@
         placeholder="请输入聊天记录" resize="none" />
       <div class="button-group">
         <el-button type="primary" @click="submitInput(inputmsg)" class="submit-btn">确定提交</el-button>
-        <el-button class="upload-btn">本地上传</el-button>
+        <el-button class="upload-btn" @click="uploadChat">本地上传</el-button>
+        <input ref="fileInput" type="file" accept=".xls,.xlsx" style="display: none" @change="handleFileChange" />
       </div>
     </div>
 
@@ -13,15 +14,32 @@
       <ChatDetail :chatList="chatList" :highLight="highLight" />
 
       <div class="classify">
-        当前聊天记录分类为：{{ currentMsg.type }}
+        <div class="classify-section">
+          <span class="label">当前聊天记录分类：</span>
+          <el-tag type="info" size="small">{{ currentMsg.type }}</el-tag>
+        </div>
+
+        <div class="classify-section">
+          <span class="label">高亮词汇：</span>
+          <div class="highlight-tags">
+            <el-tag v-for="(word, index) in highLight" :key="index" type="success" size="small" effect="light"
+              class="highlight-tag">
+              {{ word }}
+            </el-tag>
+          </div>
+        </div>
+
+        <div class="classify-section">
+          <span class="label">创建时间：</span>
+          <span class="value">{{ formatDate(currentMsg.createTime || '') }}</span>
+        </div>
+
+        <div class="classify-section">
+          <span class="label">编辑时间：</span>
+          <span class="value">{{ formatDate(currentMsg.editTime || '') }}</span>
+        </div>
       </div>
     </div>
-
-    
-
-    <!-- <div class="classify">
-      当前聊天记录分类为：{{ currentMsg.type }}
-    </div> -->
 
   </div>
 
@@ -33,6 +51,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { getChat } from '../apis/api'
 import type { Chat } from '../stores/types'
 import ChatDetail from '../components/ChatDetail.vue'
+import * as XLSX from 'xlsx'
 
 const inputmsg = ref<string>('')
 
@@ -45,10 +64,9 @@ interface ChatItem {
   content: string
 }
 
-// 处理对话数据
 const chatList = ref<ChatItem[]>([])
-
 const highLight = ref<string[]>([])
+const fileInput = ref<HTMLInputElement | null>(null)
 
 
 // 解析原始数据
@@ -66,8 +84,32 @@ const parseChatData = (rawData: string) => {
     })
   }
   chatList.value = result
-  // chatList = result
-
+}
+const formatDate = (str: string) => {
+  if (!str) return ''
+  const date = new Date(str)
+  return date.toLocaleString() // 根据浏览器本地时间显示
+}
+const readExcel = (file: File): Promise<any[][]> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer)
+        const workbook = XLSX.read(data, { type: 'array' })
+        const sheetName = workbook.SheetNames[0]
+        const sheet = workbook.Sheets[sheetName]
+        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][]
+        resolve(json)
+      } catch (error) {
+        reject(error)
+      }
+    }
+    reader.onerror = (err) => {
+      reject(err)
+    }
+    reader.readAsArrayBuffer(file)
+  })
 }
 
 const getChatMessage = async () => {
@@ -78,21 +120,55 @@ const getChatMessage = async () => {
   }
 
   let res: any = await getChat(queryPara)
-  console.log(res)
   Object.assign(currentMsg, res[0]); // 合并属性到原响应式对象 防止丢失响应性
   highLight.value = JSON.parse(currentMsg.highLight || '')
-  
+
   parseChatData(currentMsg.content || '')
 }
-
 const submitInput = (inputmsg: string) => {
   parseChatData(inputmsg)
+}
+const uploadChat = () => {
+  fileInput.value?.click()
+}
+const handleFileChange = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  // 判断文件类型（可选）
+  if (!/\.xlsx?$/.test(file.name)) {
+    ElMessage.error('请上传 Excel 文件（.xls 或 .xlsx）')
+    return
+  }
+
+  try {
+    const data = await readExcel(file)
+    const newChat: Chat = {
+      content: data[0][0],
+      highLight: "[\"信号\"]",
+      type: '',
+      createTime: '',
+      editTime: ''
+    }
+    Object.assign(currentMsg, newChat) // 响应式赋值
+    highLight.value = JSON.parse(newChat.highLight || '')
+    parseChatData(newChat.content || '')
+    ElMessage.success('Excel 聊天记录已导入')
+
+  } catch (error) {
+    console.error('读取 Excel 失败:', error)
+  }
+
+
+  // 清空 input，否则无法连续选择同一文件
+  target.value = ''
 }
 
 
 onMounted(() => {
-  // parseChatData(rawData)  // 初始化时解析数据
   getChatMessage()
+  console.log(currentMsg)
 })
 
 </script>
@@ -106,16 +182,6 @@ onMounted(() => {
   // justify-content: center;
   align-items: center;
   padding: 20px;
-
-  .inputmsg {
-    display: flex;
-    height: 150px;
-    margin-bottom: 10px;
-
-    .el-button {
-      margin: auto 50px;
-    }
-  }
 
   .input-container {
     width: 800px;
@@ -171,16 +237,46 @@ onMounted(() => {
     display: flex;
     width: 100%;
 
-
-    .classify{
-      margin-left: 20px;
-      margin-bottom: 80px;
+    .classify {
+      padding: 15px;
       width: 40%;
-      border: 1px solid #000;
+      height: 500px;
+      margin-left: 20px;
+      border: 1px solid #ebeef5;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      // background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 16px;
 
+      .classify-section {
+        font-size: 14px;
+        color: #333;
+
+        .label {
+          font-weight: 500;
+          color: #000000;
+          margin-right: 5px;
+        }
+
+        .value {
+          color: #222;
+        }
+
+        .highlight-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 6px;
+        }
+
+        .highlight-tag {
+          cursor: default;
+        }
+      }
     }
-
-
   }
 
 

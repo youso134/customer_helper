@@ -1,6 +1,21 @@
 <template>
   <div class="chat-detail">
-    <el-scrollbar class="chat-scrollbar">
+
+    <div v-if="isEmpty">当前没有数据哦</div>
+
+
+    <!-- <div v-if="!isEmpty">
+      <el-switch v-model="isHighlight" width="80px" inline-prompt active-text="高亮开启" inactive-text="高亮关闭"
+        style="margin-bottom: 10px; display: inline-flex;" />
+    </div> -->
+
+    <div v-if="!isEmpty" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+      <span style="font-size: 14px;">关键词高亮：</span>
+      <el-switch v-model="isHighlight" width="80px" inline-prompt active-text="开启" inactive-text="关闭" />
+    </div>
+
+
+    <el-scrollbar class="chat-scrollbar" v-if="!isEmpty">
       <div v-for="(item, index) in chatList" :key="index" class="message-item"
         :class="{ 'customer': item.type === 'U', 'service': item.type === 'C' }">
         <div class="avatar">
@@ -17,21 +32,18 @@
         </div>
         <div class="content">
           <div class="name">{{ item.type === 'C' ? '客服' : '顾客' }}</div>
-          <!-- <el-card shadow="hover" class="message-card">
-            {{ item.content }}
-          </el-card> -->
           <el-card shadow="hover" class="message-card">
-            <!-- 使用 v-html 渲染高亮后的内容 -->
             <div v-html="highlightText(item.content, highLight as string[])"></div>
           </el-card>
         </div>
       </div>
     </el-scrollbar>
+
   </div>
 </template>
 
 <script lang='ts' setup name='ChatDetail'>
-import { } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 // import type { PropType } from 'vue'
 
 interface ChatItem {
@@ -39,9 +51,10 @@ interface ChatItem {
   content: string
 }
 
-defineProps({
+const props = defineProps({
   chatList: {
     type: Array as () => ChatItem[],
+    default: () => []
   },
   highLight: {
     type: Array as () => string[],
@@ -49,25 +62,39 @@ defineProps({
 })
 
 
-// 高亮处理函数
-const highlightText = (text: string, keywords: string[]) => {
-  if (!keywords || keywords.length === 0) return text
+const isEmpty = computed(() => !props.chatList || props.chatList.length === 0)
+const isHighlight = ref(true)  // 默认开启高亮
 
-  // 创建正则表达式（避免特殊字符影响）
+
+// 高亮处理函数
+// const highlightText = (text: string, keywords: string[]) => {
+//   if (!keywords || keywords.length === 0) return text
+
+//   // 创建正则表达式（避免特殊字符影响）
+//   const regex = new RegExp(
+//     keywords
+//       .map(keyword => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+//       .join('|'),
+//     'g'
+//   )
+//   return text.replace(
+//     regex,
+//     '<span class="highlight">$&</span>'
+//   )
+// }
+const highlightText = (text: string, keywords: string[]) => {
+  if (!isHighlight.value || !keywords || keywords.length === 0) return text
+
   const regex = new RegExp(
-    keywords
-      .map(keyword => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
-      .join('|'),
+    keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
     'g'
   )
 
-  return text.replace(
-    regex,
-    '<span class="highlight">$&</span>'
-  )
+  return text.replace(regex, '<span class="highlight">$&</span>')
 }
 
-
+onMounted(() => {
+})
 
 </script>
 
@@ -83,6 +110,7 @@ const highlightText = (text: string, keywords: string[]) => {
   flex-direction: column;
   margin-bottom: 80px;
   // background-color: rgba(92, 201, 220, 0.5);
+
 
   .message-item {
     display: flex;
@@ -121,7 +149,7 @@ const highlightText = (text: string, keywords: string[]) => {
 
       .name {
         font-size: 12px;
-        color: #08080a;
+        color: #472c95;
         margin-bottom: 5px;
         font-weight: 500;
       }

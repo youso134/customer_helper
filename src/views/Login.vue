@@ -8,7 +8,8 @@
         </el-form-item>
 
         <el-form-item label="密码" style="margin-top: 40px;" prop="userPassword">
-          <el-input v-model="loginForm.userPassword" style="opacity: 0.5;" type="password" placeholder="请输入密码" show-password />
+          <el-input v-model="loginForm.userPassword" style="opacity: 0.5;" type="password" placeholder="请输入密码"
+            show-password />
         </el-form-item>
 
         <el-form-item prop="remember">
@@ -21,7 +22,7 @@
           </el-button>
         </el-form-item>
         <el-button type="warning" class="login-button" :loading="loading" @click="handleRegister">
-            注册
+          注册
         </el-button>
       </el-form>
     </el-card>
@@ -32,7 +33,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useRouter } from 'vue-router'
-import {loginUser} from '../apis/api.ts';
+import { loginUser } from '../apis/api.ts';
 import { useUserStore } from '../stores/index.ts';
 
 
@@ -65,24 +66,36 @@ const loginRules = reactive<FormRules>({
 // 登录处理
 const handleLogin = () => {
   loginFormRef.value?.validate(async (valid: any) => {
-    if(valid){
-      let res:any = await loginUser(loginForm)
-      userStore.setUser(res)
-      localStorage.setItem('user', JSON.stringify(res))
-      router.push('/main')
-      console.log(localStorage.getItem('user'))
+    if (valid) {
+      loading.value = true
+      try {
+        let res: any = await loginUser(loginForm)
+        if (res && res.userAccount) {
+          userStore.setUser(res)
+          localStorage.setItem('user', JSON.stringify(res))
+          router.push('/main')
+        }
+        else {
+          // ElMessage.error('登录失败，请检查账号密码')
+        }
+      } catch (error) {
+        // ElMessage.error('登录请求出错，请稍后再试')
+      } finally {
+        loading.value = false
+      }
+      // console.log(localStorage.getItem('user'))
     }
   })
 }
 
-const handleRegister = ()=>{
+const handleRegister = () => {
   router.push('/register')
 }
 
-onMounted(()=>{
+onMounted(() => {
   // 进入页面前先判断缓存中是否有用户数据，有就直接登录跳转别的页面，没有才进入登录页面。
-  let res:any = localStorage.getItem('user')
-  if(res !== null){
+  let res: any = localStorage.getItem('user')
+  if (res !== null) {
     res = JSON.parse(res)
     userStore.setUser(res)
     router.push('/main')
@@ -107,14 +120,17 @@ onMounted(()=>{
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px); /* 背后内容模糊10像素 */
-    background-color: rgba(255, 255, 255, 0.2); /* 半透明背景增强效果 */
+    backdrop-filter: blur(10px);
+    /* 背后内容模糊10像素 */
+    background-color: rgba(255, 255, 255, 0.2);
+    /* 半透明背景增强效果 */
 
     .login-title {
       text-align: center;
       margin-bottom: 24px;
       color: #303133;
     }
+
     .login-button {
       width: 100%;
       margin-top: 10px;
@@ -123,8 +139,4 @@ onMounted(()=>{
 
 
 }
-
-
-
-
 </style>
