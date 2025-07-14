@@ -157,6 +157,7 @@ const handleFileChange = async (event: Event) => {
     ElMessage.success('Excel 聊天记录已导入')
 
   } catch (error) {
+    ElMessage.error('读取失败')
     console.error('读取 Excel 失败:', error)
   }
 

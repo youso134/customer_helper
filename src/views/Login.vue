@@ -21,7 +21,7 @@
             登录
           </el-button>
         </el-form-item>
-        <el-button type="warning" class="login-button" :loading="loading" @click="handleRegister">
+        <el-button type="warning" class="login-button" @click="handleRegister">
           注册
         </el-button>
       </el-form>
