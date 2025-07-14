@@ -4,8 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "postinstall": "git update-index --assume-unchanged src/components.d.ts",
-    "dev": "git update-index --assume-unchanged src/components.d.ts && vite",
+    "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
   },
