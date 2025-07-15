@@ -104,13 +104,17 @@ onMounted(() => {
   width: 50%;
   height: 500px;
   padding: 15px;
-  border: 1px solid #ebeef5;
+  border: 1px solid #DBDDE3;
+  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   margin-bottom: 80px;
-  // background-color: rgba(92, 201, 220, 0.5);
+  
+  transition: box-shadow 0.3s ease;
+  &:hover {
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+  }
 
 
   .message-item {

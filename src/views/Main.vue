@@ -37,12 +37,11 @@ onMounted(() => {
     router.push({ name: 'chatlog' })
   }
 
-  let res = localStorage.getItem('user')
-  // console.log(res !== null ? JSON.parse(res) : '本地没有user')
-  if (res === null) {
-    console.log('本地没有user，跳转回登录页面')
-    router.push('/login')
-  }
+  // let res = localStorage.getItem('user')
+  // if (res === null) {
+  //   ElMessage.error('没有登录记录，请返回登录。')
+  //   router.push('/login')
+  // }
 })
 
 </script>
@@ -51,6 +50,7 @@ onMounted(() => {
 .main-layout {
   height: 100vh;
   // width: 100vw;
+  background-color: #EFF0F2;
 
   .el-header,
   .el-main {

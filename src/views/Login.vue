@@ -1,31 +1,38 @@
 <template>
   <div class="login-container">
-    <el-card class="login-card">
-      <h2 class="login-title">质检助手系统登录</h2>
-      <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" label-position="top">
-        <el-form-item label="账户" prop="userAccount">
-          <el-input v-model="loginForm.userAccount" style="opacity: 0.5" placeholder="请输入账号" />
-        </el-form-item>
 
-        <el-form-item label="密码" style="margin-top: 40px;" prop="userPassword">
-          <el-input v-model="loginForm.userPassword" style="opacity: 0.5;" type="password" placeholder="请输入密码"
-            show-password />
-        </el-form-item>
+    <div class="cards">
+      <el-card class="login-card card-left">
+        <h2 class="login-title">质检助手系统登录</h2>
 
-        <el-form-item prop="remember">
-          <el-checkbox v-model="isRemember">记住我</el-checkbox>
-        </el-form-item>
+      </el-card>
+      <el-card class="login-card">
+        <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" label-position="top">
+          <el-form-item label="账户" prop="userAccount">
+            <el-input v-model="loginForm.userAccount" style="opacity: 0.5" placeholder="请输入账号" />
+          </el-form-item>
 
-        <el-form-item>
-          <el-button type="primary" class="login-button" :loading="loading" @click="handleLogin">
-            登录
+          <el-form-item label="密码" style="margin-top: 40px;" prop="userPassword">
+            <el-input v-model="loginForm.userPassword" style="opacity: 0.5;" type="password" placeholder="请输入密码"
+              show-password />
+          </el-form-item>
+
+          <el-form-item prop="remember">
+            <el-checkbox v-model="isRemember">记住我</el-checkbox>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button type="primary" class="login-button" :loading="loading" @click="handleLogin">
+              登录
+            </el-button>
+          </el-form-item>
+          <el-button type="warning" class="login-button" @click="handleRegister">
+            注册
           </el-button>
-        </el-form-item>
-        <el-button type="warning" class="login-button" @click="handleRegister">
-          注册
-        </el-button>
-      </el-form>
-    </el-card>
+        </el-form>
+      </el-card>
+    </div>
+
   </div>
 </template>
 
@@ -68,7 +75,7 @@ const handleLogin = () => {
     if (valid) {
       loading.value = true
       try {
-        
+
         let res: any = await loginUser(loginForm)
         if (res && res.userAccount) {
           userStore.setUser(res)
@@ -115,26 +122,44 @@ onMounted(() => {
   overflow: hidden;
   margin: 0;
 
-  .login-card {
-    width: 400px;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    /* 背后内容模糊10像素 */
-    background-color: rgba(255, 255, 255, 0.2);
-    /* 半透明背景增强效果 */
-
-    .login-title {
-      text-align: center;
-      margin-bottom: 24px;
-      color: #303133;
+  .cards {
+    display: flex;
+    transition: box-shadow 0.3s ease;
+    &:hover {
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.5);
     }
 
-    .login-button {
-      width: 100%;
-      margin-top: 10px;
+    .login-card {
+      width: 400px;
+      height: 500px;
+      padding: 20px;
+      border: 1px solid #42baff;
+      border-radius: 0px 5px 5px 0px;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      /* 背后内容模糊10像素 */
+      background-color: rgba(255, 255, 255, 0.4);
+
+      &.card-left {
+        border-radius: 5px 0px 0px 5px;
+        background-color: rgba(39, 118, 255, 0.5);
+
+      }
+
+      .login-title {
+        text-align: center;
+        margin-bottom: 24px;
+        color: #303133;
+      }
+
+      .login-button {
+        width: 100%;
+        margin-top: 10px;
+      }
+
     }
+
+
   }
 
 

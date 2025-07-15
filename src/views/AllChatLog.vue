@@ -3,11 +3,12 @@
     <!-- 搜索区域 -->
     <div class="search">
       <!-- 搜索框 -->
-      <el-input v-model="searchText" placeholder="请输入关键字搜索" clearable class="search-input" /> 
+      <el-input maxlength="15" show-word-limit v-model="sendData.searchText" placeholder="请输入关键字搜索" clearable
+        class="search-input" />
 
       <!-- 分类筛选 -->
       <div class="filter-category">
-        <el-select v-model="selectedCategory" placeholder="请选择分类" clearable>
+        <el-select v-model="sendData.category" placeholder="请选择分类" clearable>
           <el-option v-for="cat in categoryOptions" :key="cat" :label="cat" :value="cat" />
         </el-select>
       </div>
@@ -24,55 +25,52 @@
         <el-table-column prop="category" label="分类" />
       </el-table>
     </div>
+
+    <div class="demo-pagination-block">
+      <el-pagination v-model:current-page="sendData.currentPage" v-model:page-size="sendData.pageSize"
+        :page-sizes="[5, 10, 20, 40]" size="small" :disabled="false" :background="false" :pager-count="7"
+        layout="total, sizes, prev, pager, next, jumper" :total="allLog.totalAmount" @size-change="handleSizeChange"
+        @current-change="handleCurrentChange" />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup name="AllChatLog">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { initAllLog } from '@/stores'
 
-// 原始数据
-const rawData = ref([
-  { id: 1, name: 'Alice', message: '你好，这是第一条消息', category: '技术' },
-  { id: 2, name: 'Bob', message: '第二条聊天记录在这里', category: '生活' },
-  { id: 3, name: 'Charlie', message: '这是另一条信息', category: '技术' },
-  { id: 4, name: 'David', message: '周末计划安排', category: '娱乐' },
-])
+const sendData = ref({ pageSize: 10, currentPage: 2, category: '', searchText:'' })
 
-// 搜索关键词和分类选中项
-const searchText = ref('')   // 现在是在name和message中一起搜索
-const selectedCategory = ref('')
+const allLog = ref(initAllLog())
+const rawData = allLog.value.content
 
 // 所有分类选项（也可以动态生成）
-const categoryOptions = Array.from(new Set(rawData.value.map(item => item.category)))
+const categoryOptions = Array.from(new Set(rawData.map(item => item.category)))
 
-// 过滤逻辑
-// const filteredData = computed(() => {
-//   return rawData.value.filter((item) => {
-//     const matchSearch =
-//       item.name.toLowerCase().includes(searchText.value.toLowerCase()) ||
-//       item.message.toLowerCase().includes(searchText.value.toLowerCase())
-
-//     const matchCategory =
-//       !selectedCategory.value || item.category === selectedCategory.value
-
-//     return matchSearch && matchCategory
-//   })
-// })
 let filteredData = ref()
 
+const handleSizeChange = (val: number) => {
+  sendData.value.pageSize = val
+  console.log(`${val} items per page`)
+}
+const handleCurrentChange = (val: number) => {
+  sendData.value.currentPage = val
+  console.log(`current page: ${val}`)
+}
+
 const handleSearch = () => {
-  filteredData.value = rawData.value.filter((item) => {
+  filteredData.value = rawData.filter((item) => {
     const matchSearch =
-      item.name.toLowerCase().includes(searchText.value.toLowerCase()) ||
-      item.message.toLowerCase().includes(searchText.value.toLowerCase())
+      item.name.toLowerCase().includes(sendData.value.searchText.toLowerCase()) ||
+      item.message.toLowerCase().includes(sendData.value.searchText.toLowerCase())
     const matchCategory =
-      !selectedCategory.value || item.category === selectedCategory.value
+      !sendData.value.category || item.category === sendData.value.category
     return matchSearch && matchCategory
   })
 }
 
 onMounted(() => {
-  filteredData.value = rawData.value
+  filteredData.value = rawData
 })
 </script>
 
@@ -80,14 +78,14 @@ onMounted(() => {
 .container {
   .search {
     height: 60px;
-    width: 500px;
+    width: 90%;
     margin: 20px;
     display: flex;
     align-items: center;
     gap: 20px;
 
     .search-input {
-      flex: 1;
+      width: 300px;
     }
 
     .filter-category {
@@ -96,9 +94,14 @@ onMounted(() => {
   }
 
   .content {
-    height: 600px;
+    width: 90%;
     margin: 20px;
     overflow: auto;
   }
+
+  .demo-pagination-block{
+    margin: 20px;
+  }
+
 }
 </style>

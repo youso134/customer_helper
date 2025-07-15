@@ -59,7 +59,8 @@ onMounted(() => {
     userStore.setUser(res)
   }
   else{
-    ElMessage.error('未读取到浏览器缓存User')
+    // ElMessage.error('未读取到浏览器缓存User')
+    console.log('mianheader没读取到user')
   }
 })
 </script>

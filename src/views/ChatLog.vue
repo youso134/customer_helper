@@ -21,7 +21,8 @@
         <div class="classify-section">
           <span class="label">高亮词汇：</span>
           <div class="highlight-tags">
-            <el-tag v-for="(word, index) in highLight" :key="index" type="success" size="small" effect="light" class="highlight-tag">
+            <el-tag v-for="(word, index) in highLight" :key="index" type="success" size="small" effect="light"
+              class="highlight-tag">
               {{ word }}
             </el-tag>
           </div>
@@ -39,12 +40,8 @@
 
     <!-- 弹出手动输入窗口 -->
     <el-dialog v-model="dialogVisible" title="手动输入聊天记录" width="600px" :close-on-click-modal="false">
-      <el-input
-        v-model="inputmsg"
-        type="textarea"
-        :autosize="{ minRows: 8, maxRows: 12 }"
-        placeholder="请输入聊天记录（例如：C: 欢迎光临；U: 网络不好）" resize="none"
-      />
+      <el-input v-model="inputmsg" type="textarea" :autosize="{ minRows: 8, maxRows: 12 }"
+        placeholder="请输入聊天记录（例如：C: 欢迎光临；U: 网络不好）" resize="none" />
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="submitAndClose">提交</el-button>
@@ -207,11 +204,18 @@ onMounted(() => {
 
     .classify {
       width: 35%;
+      height: 500px;
       margin-left: 20px;
       padding: 20px;
-      background-color: #f9f9f9;
+      background-color: #FFF;
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+      transition: box-shadow 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+      }
+
 
       .classify-section {
         margin-bottom: 16px;
@@ -236,5 +240,4 @@ onMounted(() => {
 
 
 }
-
 </style>
