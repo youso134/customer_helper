@@ -10,7 +10,32 @@
 
     <!-- 主内容区 -->
     <div class="main-content">
-      <ChatDetail :chatList="chatList" :highLight="highLight" :currentMsg="currentMsg" />
+      <ChatDetail :chatList="chatList" :highLight="highLight" />
+
+      <!-- 右侧分类区域 -->
+      <div class="classify">
+        <div class="classify-section">
+          <span class="label">当前聊天记录分类：</span>
+          <el-tag type="primary" size="small">{{ currentMsg.type }}</el-tag>
+        </div>
+        <div class="classify-section">
+          <span class="label">高亮词汇：</span>
+          <div class="highlight-tags">
+            <el-tag v-for="(word, index) in highLight" :key="index" type="success" size="small" effect="light"
+              class="highlight-tag">
+              {{ word }}
+            </el-tag>
+          </div>
+        </div>
+        <div class="classify-section">
+          <span class="label">创建时间：</span>
+          <span class="value">{{ formatDate(currentMsg.createTime || '') }}</span>
+        </div>
+        <div class="classify-section">
+          <span class="label">编辑时间：</span>
+          <span class="value">{{ formatDate(currentMsg.editTime || '') }}</span>
+        </div>
+      </div>
     </div>
 
     <!-- 弹出手动输入窗口 -->
@@ -29,9 +54,9 @@
 <script lang='ts' setup>
 import { onMounted, reactive, ref } from 'vue'
 // import { Avatar, User } from '@element-plus/icons-vue'
-import { getChat } from '@/apis/api'
-import type { Chat } from '@/stores/types'
-import ChatDetail from '@/components/ChatDetail.vue'
+import { getChat } from '../apis/api'
+import type { Chat } from '../stores/types'
+import ChatDetail from '../components/ChatDetail.vue'
 import * as XLSX from 'xlsx'
 
 interface ChatItem {
@@ -64,6 +89,11 @@ const parseChatData = (rawData: string) => {
     })
   }
   chatList.value = result
+}
+const formatDate = (str: string) => {
+  if (!str) return ''
+  const date = new Date(str)
+  return date.toLocaleString() // 根据浏览器本地时间显示
 }
 const readExcel = (file: File): Promise<any[][]> => {
   return new Promise((resolve, reject) => {
@@ -171,6 +201,41 @@ onMounted(() => {
     width: 100%;
     // max-width: 1000px;
     margin-top: 20px;
+
+    .classify {
+      width: 35%;
+      height: 500px;
+      margin-left: 20px;
+      padding: 20px;
+      background-color: #FFF;
+      border-radius: 8px;
+
+      transition: box-shadow 0.3s ease;
+
+      &:hover {
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.2);
+      }
+
+
+      .classify-section {
+        margin-bottom: 16px;
+
+        .label {
+          font-weight: 600;
+        }
+
+        .highlight-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 6px;
+        }
+
+        .highlight-tag {
+          cursor: default;
+        }
+      }
+    }
   }
 
 
