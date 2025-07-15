@@ -9,10 +9,10 @@
 body{
   background-color: #ffffff;
 
-  /* background-image: url(@/assets/images/4.png);
+  background-image: url(@/assets/images/bg.jpg);
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  background-position: center; */
+  background-position: center;
 
 }
 
