@@ -18,11 +18,18 @@
 
     <!-- 内容展示区域 -->
     <div class="content">
-      <el-table :data="filteredData" style="width: 100%">
+      <el-table :data="contentData" style="width: 100%">
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="名称" />
         <el-table-column prop="message" label="消息内容" />
         <el-table-column prop="category" label="分类" />
+        <el-table-column label="操作">
+          <template #default="scope">
+            <el-button type="primary" size="small" @click="goDetail(scope.$index, scope.row)">
+              详情
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
 
@@ -38,39 +45,35 @@
 <script lang="ts" setup name="AllChatLog">
 import { ref, onMounted } from 'vue'
 import { initAllLog } from '@/stores'
+import { getDialog } from '@/apis/api'
 
-const sendData = ref({ pageSize: 10, currentPage: 2, category: '', searchText:'' })
+const sendData = ref({ pageSize: 10, currentPage: 2, category: '', searchText: '' })
 
-const allLog = ref(initAllLog())
-const rawData = allLog.value.content
+const allLog = initAllLog()
+let contentData = ref(allLog.content)
 
 // 所有分类选项（也可以动态生成）
-const categoryOptions = Array.from(new Set(rawData.map(item => item.category)))
+const categoryOptions = Array.from(new Set(contentData.value.map(item => item.category)))
 
-let filteredData = ref()
 
 const handleSizeChange = (val: number) => {
   sendData.value.pageSize = val
-  console.log(`${val} items per page`)
+  handleSearch()
 }
 const handleCurrentChange = (val: number) => {
   sendData.value.currentPage = val
-  console.log(`current page: ${val}`)
+  handleSearch()
 }
 
-const handleSearch = () => {
-  filteredData.value = rawData.filter((item) => {
-    const matchSearch =
-      item.name.toLowerCase().includes(sendData.value.searchText.toLowerCase()) ||
-      item.message.toLowerCase().includes(sendData.value.searchText.toLowerCase())
-    const matchCategory =
-      !sendData.value.category || item.category === sendData.value.category
-    return matchSearch && matchCategory
-  })
+const handleSearch = async () => {
+  const res = await getDialog(sendData.value) as { reply: any }
+  contentData.value = res.reply
+}
+const goDetail = (index: any, row: any) => {
+  console.log(index,row)
 }
 
 onMounted(() => {
-  filteredData.value = rawData
 })
 </script>
 
@@ -99,7 +102,7 @@ onMounted(() => {
     overflow: auto;
   }
 
-  .demo-pagination-block{
+  .demo-pagination-block {
     margin: 20px;
   }
 

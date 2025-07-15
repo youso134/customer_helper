@@ -24,6 +24,7 @@ export default defineConfig({
       // "@": '/',
     },
   },
+  
   // server: {
   //   proxy: {
   //     // 代理所有以 /api 开头的请求
