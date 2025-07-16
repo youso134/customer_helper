@@ -1,5 +1,5 @@
 import request from "./request";
-import type {User, Chat} from '../stores/types.ts'
+import type {User, Chat, Register, updated} from '../stores/types.ts'
 
 
 export function loginUser(data: User) {
@@ -24,6 +24,24 @@ export function getChat(data: Chat){
   });
 }
 
+export function Register(data: Register){
+  return request({
+    url: "/api/user/register",
+    method: "post",
+    headers: {
+      "Content-Type": "application/json", 
+    },
+    data: JSON.stringify(data)
+  });
+}
 
-
-
+export function update(data: updated){
+  return request({
+    url: "/api/user/update",
+    method: "post",
+    headers: {
+      "Content-Type": "application/json", 
+    },
+    data: JSON.stringify(data)
+  });
+}

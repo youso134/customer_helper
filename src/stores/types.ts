@@ -21,3 +21,23 @@ export interface Chat {
 	createTime?: string,
 	type?: string
 }
+
+export interface Register {
+  uid?: number,
+  userName?:string,
+  userAccount: string,
+  userPassword?: string,
+  confirmPassword?: string,
+  gender?: 'male'|'female',
+  phone?: '',
+  email?: '';
+}
+
+export interface updated {
+  username?: string;  
+  userRole?: string;   
+  avatar?: string;     
+  gender?: "male" | "female" |"unknown";
+  phone?: string;     
+  email?: string;      
+}
