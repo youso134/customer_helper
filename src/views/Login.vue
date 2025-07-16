@@ -77,7 +77,7 @@ const handleLogin = () => {
       try {
 
         let res: any = await loginUser(loginForm)
-        res = res.data
+        // res = res.data
         if (res && res.userAccount) {
           userStore.setUser(res)
           // localStorage.setItem('user', userStore.user)

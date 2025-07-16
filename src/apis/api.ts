@@ -24,15 +24,9 @@ export function getChat(data: Chat){
   });
 }
 
-
-interface DialogResponse {
-  reply: string
-  [key: string]: any
-}
-
-export function getDialog(data:any): Promise<DialogResponse> {
+export function getDialoguePage(data:any) {
   return request({
-    url: "/dialog/getDialog",
+    url: "/dialogue/getDialoguePage",
     method: "post",
     headers: {
       "Content-Type": "application/json", 
@@ -41,9 +35,19 @@ export function getDialog(data:any): Promise<DialogResponse> {
   });
 }
 
-export function getDialogDetail(data:any) {
+export function getDialogueDetailByDid(data:any) {
   return request({
     url: "/dialogue/getDialogueDetailByDid",
+    method: "post",
+    headers: {
+      "Content-Type": "application/json", 
+    },
+    data: JSON.stringify(data)
+  });
+}
+export function addChatByBatch(data:any) {
+  return request({
+    url: "/chat/addChatByBatch",
     method: "post",
     headers: {
       "Content-Type": "application/json", 

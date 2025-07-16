@@ -11,13 +11,25 @@ export interface User {
 
 export interface Chat {
   cid?: number,
+  did?: number,
 	consumerId?: number,
 	clientId?: number,
 	content?: string,
-	highLight?: string,
-	sensitiveWord?: string,
-	position?: string,
+  role?: string,
+	sensitiveReason?: string | null,
 	editTime?: string,
 	createTime?: string,
-	type?: string
+  type?: 'C' | 'U'
+}
+
+
+export interface DialogueItem {
+	did:number,
+	consumerId:Number,
+	clientId:Number,
+	type:string,
+	resume:string,
+	highlight:string,
+  createTime: string
+  editTime?: string
 }
