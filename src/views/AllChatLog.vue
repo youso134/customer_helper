@@ -53,7 +53,7 @@
 <script lang="ts" setup name="AllChatLog">
 import { ref, reactive, onMounted } from 'vue'
 import { initAllLog } from '@/stores'
-import { getDialog, getChat } from '@/apis/api'
+import { getDialog, getDialogDetail } from '@/apis/api'
 import type { Chat } from '@/stores/types'
 
 
@@ -131,6 +131,17 @@ const getChatMessage = async () => {
   // Object.assign(currentMsg, res[0]); // 合并属性到原响应式对象 防止丢失响应性
   // highLight.value = JSON.parse(currentMsg.highLight || '')
   // parseChatData(currentMsg.content || '')
+
+  try {
+    const res = await getDialogDetail({ did: 111 })
+    console.log('222', res)
+  } catch (error) {
+    console.log(error)
+  }
+
+
+
+
 
   const newChat: Chat = {
     content: rawData,

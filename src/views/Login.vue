@@ -77,11 +77,13 @@ const handleLogin = () => {
       try {
 
         let res: any = await loginUser(loginForm)
+        res = res.data
         if (res && res.userAccount) {
           userStore.setUser(res)
           // localStorage.setItem('user', userStore.user)
           localStorage.setItem('user', JSON.stringify(res))
           router.push('/main')
+          ElMessage.success('成功登陆')
         }
         else {
           // ElMessage.error('登录失败，请检查账号密码')

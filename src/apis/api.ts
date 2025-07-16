@@ -41,6 +41,17 @@ export function getDialog(data:any): Promise<DialogResponse> {
   });
 }
 
+export function getDialogDetail(data:any) {
+  return request({
+    url: "/dialogue/getDialogueDetailByDid",
+    method: "post",
+    headers: {
+      "Content-Type": "application/json", 
+    },
+    data: JSON.stringify(data)
+  });
+}
+
 
 
 

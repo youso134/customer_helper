@@ -7,8 +7,8 @@ import axios from "axios";
 // };
 
 const service = axios.create({
-  baseURL: 'http://localhost:3000'
-  // baseURL: "http://192.168.147.111:8080/api",
+  // baseURL: 'http://localhost:3000'
+  baseURL: "http://192.168.147.111:8080/api",
 });
 const NETWORK_ERR = "网络错误";
 
@@ -28,9 +28,8 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (res: any) => {
     const { code, data, message } = res.data;
-    // ElMessage.success(message)
     if (code === 200) {
-      return data;
+      return res.data;
     } else {
       ElMessage.error(message || NETWORK_ERR);
       return Promise.reject(message || NETWORK_ERR);
