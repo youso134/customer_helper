@@ -24,7 +24,7 @@ export function getChat(data: Chat){
   });
 }
 
-export function Register(data: Register){
+export function registerUser(data: Register){
   return request({
     url: "/user/register",
     method: "post",
@@ -35,7 +35,7 @@ export function Register(data: Register){
   });
 }
 
-export function update(data: updated){
+export function updateUser(data: updated){
   return request({
     url: "/user/update",
     method: "post",
@@ -43,5 +43,16 @@ export function update(data: updated){
       "Content-Type": "application/json", 
     },
     data: JSON.stringify(data)
+  });
+}
+
+export function getuser(uid:number) {
+  return request({
+    url: "/user/getLoginUser",
+    method: "get",
+    headers: {
+      "Content-Type": "application/json", 
+    },
+    data: JSON.stringify({'uid':uid})
   });
 }

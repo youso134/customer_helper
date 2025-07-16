@@ -102,7 +102,7 @@ import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { loginUser } from '@/apis/api'
-import { Register } from '@/apis/api'
+import { registerUser } from '@/apis/api'
 
 
 const router = useRouter()
@@ -185,7 +185,7 @@ const handleSubmit = async () => {
   try {
     await registerForm.value.validate()
     isSubmitting.value = true
-    const { data } = await Register(form)
+    const { data } = await registerUser(form)
       ElMessage.success('注册成功！')
       setTimeout(() => {
         router.push('/')

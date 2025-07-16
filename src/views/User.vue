@@ -20,7 +20,7 @@
           >
         </div>
         <div class="user-info">
-          <h2 class="username">{{ userInfo.username }}</h2>
+          <h2 class="userName">{{ userInfo.userName }}</h2>
           <el-tag type="info" class="user-role">{{ userInfo.userRole }}</el-tag>
         </div>
       </div>
@@ -34,9 +34,9 @@
           label-position="top"
         >
           <div class="form-row">
-            <el-form-item label="用户名" prop="username">
+            <el-form-item label="用户名" prop="userName">
               <el-input
-                v-model="userInfo.username"
+                v-model="userInfo.userName"
                 placeholder="请输入用户名"
                 :disabled="!editMode"
               />
@@ -122,19 +122,21 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElLoading } from 'element-plus'
+import axios from 'axios'
 import { Camera, Edit, Check, Close, Lock } from '@element-plus/icons-vue'
+import { updateUser, getuser } from '@/apis/api'
 
 const editMode = ref(false)
 const fileInput = ref(null)
 const userForm = ref(null)
 
 const userInfo = reactive({
-  username: '张三',
-  userRole: '客服主管',
-  avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-  gender: '男',
-  phone: '13800138000',
-  email: 'zhangsan@example.com'
+  userName: '',
+  userRole: '',
+  avatar: '',
+  gender: '',
+  phone: '',
+  email: ''
 })
 
 const originalInfo = ref({})
@@ -154,7 +156,7 @@ const validateEmail = (rule, value, callback) => {
 }
 
 const rules = reactive({
-  username: [
+  userName: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 2, max: 12, message: '长度在 2 到 12 个字符', trigger: 'blur' }
   ],
@@ -188,14 +190,22 @@ const enterEditMode = () => {
 const saveProfile = async () => {
   try {
     await userForm.value.validate()
-    const loading = ElLoading.service({ lock: true, text: '保存中...', background: 'rgba(0, 0, 0, 0.7)' })
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    originalInfo.value = JSON.parse(JSON.stringify(userInfo))
-    editMode.value = false
-    ElMessage.success('个人信息已保存')
-    loading.close()
-  } catch {
+    const loading = ElLoading.service({
+      lock: true,
+      text: '保存中...',
+      background: 'rgba(0, 0, 0, 0.7)'
+    })
+    const res = await updateUser(userInfo)
+    if (res.data?.code === 200 || res.code === 200) {
+      originalInfo.value = JSON.parse(JSON.stringify(userInfo))
+      editMode.value = false
+      ElMessage.success('个人信息已保存')
+    } else {
+      ElMessage.error(res.data?.message || '保存失败')
+    }
+  } catch (error) {
     ElMessage.error('请检查表单填写是否正确')
+  } finally {
     ElLoading.service().close()
   }
 }
@@ -263,10 +273,49 @@ const submitPasswordChange = async () => {
   }
 }
 
-// 初始化数据
-onMounted(() => {
-  originalInfo.value = JSON.parse(JSON.stringify(userInfo))
-  tempInfo.value = JSON.parse(JSON.stringify(userInfo))
+const getUserInfo = async () =>{
+  const userStr = localStorage.getItem('user')
+  if (!userStr) {
+    ElMessage.error('用户未登录，请重新登录')
+    return
+  }
+
+  let uid = null
+  try {
+    const user = JSON.parse(userStr)
+    uid = user?.uid
+  } catch (e) {
+    ElMessage.error('用户信息解析失败,请重新登录')
+    return
+  }
+
+  if (!uid) {
+    ElMessage.error('用户ID缺失,请重新登录')
+    return
+  }
+
+  try {
+    console.log(uid)
+    const res = await getuser(uid)
+
+
+    ElMessage.info('111')
+    if (res.data?.code === 200 || res.code === 200) {
+      const data = res.data?.data || res.data
+      Object.assign(userInfo, data)
+      originalInfo.value = JSON.parse(JSON.stringify(userInfo))
+      tempInfo.value = JSON.parse(JSON.stringify(userInfo))
+    } else {
+      ElMessage.error(res.data?.message || '获取用户信息失败')
+    }
+  } catch (error) {
+    ElMessage.error('获取用户信息出错')
+  }
+}
+
+// 初始化数据：从 localStorage 获取 uid，并请求用户信息
+onMounted(()=>{
+  getUserInfo()
 })
 </script>
 
@@ -372,7 +421,7 @@ onMounted(() => {
 
 /* 用户信息部分 */
 .user-info {
-  .username {
+  .userName {
     font-size: 24px;
     font-weight: 700;
     color: #2c3e50;

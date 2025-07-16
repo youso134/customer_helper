@@ -33,7 +33,8 @@ export interface Register {
 }
 
 export interface updated {
-  username?: string;  
+  uid?:number;
+  userName?: string;  
   userRole?: string;   
   avatar?: string;     
   gender?: "male" ;
