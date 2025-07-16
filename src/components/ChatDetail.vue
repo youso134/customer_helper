@@ -11,38 +11,40 @@
         style="margin-bottom: 10px; display: inline-flex;" />
     </div> -->
 
-      <div v-if="!isEmpty" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-        <span style="font-size: 14px;">关键词高亮：</span>
-        <el-switch v-model="isHighlight" width="80px" inline-prompt active-text="开启" inactive-text="关闭" />
-        <span style="font-size: 14px;">敏感词高亮：</span>
-        <el-switch v-model="isSensitive" width="80px" inline-prompt active-text="开启" inactive-text="关闭" />
-      </div>
+      <div v-if="!isEmpty">
 
-      <el-scrollbar class="chat-scrollbar" v-if="!isEmpty">
-        <div v-for="(item, index) in chatList" :key="index" class="message-item"
-          :class="item.type === 'U' ? 'customer' : 'service'">
-          <!-- :class="{ 'customer': item.type === 'U', 'service': item.type === 'C' }"> -->
-          <div class="avatar">
-            <el-avatar v-if="item.type === 'C'" style="background-color: #87CEFA">
-              <el-icon>
-                <Service />
-              </el-icon>
-            </el-avatar>
-            <el-avatar v-else style="background-color: #67c23a">
-              <el-icon>
-                <UserFilled />
-              </el-icon>
-            </el-avatar>
-          </div>
-          <div class="content">
-            <div class="name">{{ item.type === 'C' ? '客服' : '顾客' }}</div>
-            <el-card shadow="hover" class="message-card">
-              <div v-html="highlightText(item.content || '', sensitive, highlight)"></div>
-            </el-card>
-          </div>
+        <div v-if="!isEmpty2" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <span style="font-size: 14px;">关键词高亮：</span>
+          <el-switch v-model="isHighlight" width="80px" inline-prompt active-text="开启" inactive-text="关闭" />
+          <span style="font-size: 14px;">敏感词高亮：</span>
+          <el-switch v-model="isSensitive" width="80px" inline-prompt active-text="开启" inactive-text="关闭" />
         </div>
-      </el-scrollbar>
 
+        <el-scrollbar class="chat-scrollbar" v-if="!isEmpty">
+          <div v-for="(item, index) in chatList" :key="index" class="message-item"
+            :class="item.type === 'U' ? 'customer' : 'service'">
+            <!-- :class="{ 'customer': item.type === 'U', 'service': item.type === 'C' }"> -->
+            <div class="avatar">
+              <el-avatar v-if="item.type === 'C'" style="background-color: #87CEFA">
+                <el-icon>
+                  <Service />
+                </el-icon>
+              </el-avatar>
+              <el-avatar v-else style="background-color: #67c23a">
+                <el-icon>
+                  <UserFilled />
+                </el-icon>
+              </el-avatar>
+            </div>
+            <div class="content">
+              <div class="name">{{ item.type === 'C' ? '客服' : '顾客' }}</div>
+              <el-card shadow="hover" class="message-card">
+                <div v-html="highlightText(item.content || '', sensitive, highlight)"></div>
+              </el-card>
+            </div>
+          </div>
+        </el-scrollbar>
+      </div>
     </div>
 
     <!-- 右侧分类区域 -->
@@ -175,7 +177,10 @@ const formatDate = (str: string) => {
 }
 
 
-onMounted(()=>{
+onMounted(() => {
+  // rawChatData.value = []
+
+
 })
 
 </script>

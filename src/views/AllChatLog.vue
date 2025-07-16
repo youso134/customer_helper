@@ -67,7 +67,7 @@ interface ChatItem {
   type: 'C' | 'U'  // 明确指定只能是这两种值
   content: string
 }
-const sendData = ref({ pageSize: 5, currentPage: 1, type: '', searchContent: '' })
+const sendData = ref({ pageSize: 5, currentPage: 1, type: '', searchContent: null})
 let contentData = ref<DialogueItem[]>([])
 // 所有分类选项（也可以动态生成）
 let categoryOptions: any = []
@@ -135,7 +135,6 @@ const rawChatData = [
   }
 ]
 
-
 const handleSizeChange = (val: number) => {
   sendData.value.pageSize = val
   handleSearch()
@@ -146,6 +145,8 @@ const handleCurrentChange = (val: number) => {
 }
 
 const handleSearch = async () => {
+  // if(sendData.value.type === '') sendData.value.type = null
+  if(sendData.value.searchContent === '') sendData.value.searchContent = null
   const res = await getDialoguePage(sendData.value)
   console.log(res)
   contentData.value = res.records
