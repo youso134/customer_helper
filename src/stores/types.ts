@@ -23,21 +23,20 @@ export interface Chat {
 }
 
 export interface Register {
-  uid?: number,
   userName?:string,
   userAccount: string,
   userPassword?: string,
   confirmPassword?: string,
   gender?: 'male'|'female',
-  phone?: '',
-  email?: '';
+  phone?: '13800000000',
+  email?: '123@qq.com';
 }
 
 export interface updated {
   username?: string;  
   userRole?: string;   
   avatar?: string;     
-  gender?: "male" | "female" |"unknown";
-  phone?: string;     
-  email?: string;      
+  gender?: "male" ;
+  phone?: "13800000000";     
+  email?: "123@qq.com";      
 }

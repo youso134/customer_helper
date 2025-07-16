@@ -26,7 +26,7 @@ export function getChat(data: Chat){
 
 export function Register(data: Register){
   return request({
-    url: "/api/user/register",
+    url: "/user/register",
     method: "post",
     headers: {
       "Content-Type": "application/json", 
@@ -37,7 +37,7 @@ export function Register(data: Register){
 
 export function update(data: updated){
   return request({
-    url: "/api/user/update",
+    url: "/user/update",
     method: "post",
     headers: {
       "Content-Type": "application/json", 

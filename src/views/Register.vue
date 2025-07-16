@@ -35,7 +35,7 @@
             <el-input
               v-model="form.userPassword"
               type="password"
-              placeholder="请输入6-20位密码"
+              placeholder="请输入6-20位密码(需包含大写字母、小写字母和数字)"
               show-password
             />
           </el-form-item>
@@ -114,8 +114,8 @@ const form = reactive({
   userPassword: '',
   confirmPassword: '',
   gender: 'male',
-  phone: '',
-  email: ''
+  phone: '13800000000',
+  email: '123@qq.com'
 })
 
 const rules = reactive({
@@ -129,6 +129,22 @@ const rules = reactive({
   ],
   userPassword: [
     { required: true, message: '密码不能为空', trigger: 'blur' },
+    { 
+      validator: (rule, value, callback) => {
+        if (!/[A-Z]/.test(value)) {
+          callback(new Error('密码必须包含至少一个大写字母'))
+        } else if (!/[a-z]/.test(value)) {
+          callback(new Error('密码必须包含至少一个小写字母'))
+        } else if (!/[0-9]/.test(value)) {
+          callback(new Error('密码必须包含至少一个数字'))
+        } else if (/[\u4e00-\u9fa5]/.test(value)) {
+          callback(new Error('密码不能包含中文'))
+        } else {
+          callback()
+        }
+      },
+    trigger: 'blur'
+    },
     { min: 6, max: 20, message: '密码长度应为6-20位', trigger: 'blur' }
   ],
   confirmPassword: [
@@ -169,20 +185,11 @@ const handleSubmit = async () => {
   try {
     await registerForm.value.validate()
     isSubmitting.value = true
-    // 提交注册信息（不带 uid）
     const { data } = await Register(form)
-    if (data && data.uid) {
-      // 成功接收 uid，保存到本地
-      console.log('后端返回的 uid:', data.uid)
-      // 示例：保存到 localStorage
-      localStorage.setItem('uid', data.uid)
       ElMessage.success('注册成功！')
       setTimeout(() => {
         router.push('/')
       }, 100)
-    } else {
-      throw new Error('未收到 UID')
-    }
   } catch (error) {
     console.error('注册失败:', error)
     ElMessage.error('注册失败，请检查表单或网络')
