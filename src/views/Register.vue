@@ -1,300 +1,192 @@
 <template>
   <div class="register-container">
-    <div class="register-card">
+    <el-card class="register-card">
       <h2 class="register-title">用户注册</h2>
       
       <div class="form-scroll-container">
-        <form @submit.prevent="handleSubmit" class="register-form">
+        <el-form 
+          ref="registerForm"
+          :model="form" 
+          :rules="rules" 
+          @submit.prevent="handleSubmit"
+          label-position="top"
+          class="register-form"
+        >
           <!-- 用户名 -->
-          <div class="form-group">
-            <label for="userName">用户名</label>
-            <input
-              type="text"
-              id="userName"
+          <el-form-item label="用户名" prop="userName">
+            <el-input
               v-model="form.userName"
-              @blur="validateUserName"
               placeholder="请输入1-16位用户名(支持中文)"
-              class="form-input"
+              clearable
             />
-            <span class="error-message" v-if="errors.userName">{{ errors.userName }}</span>
-          </div>
+          </el-form-item>
 
           <!-- 账号 -->
-          <div class="form-group">
-            <label for="userAccount">登录账号</label>
-            <input
-              type="text"
-              id="userAccount"
+          <el-form-item label="登录账号" prop="userAccount">
+            <el-input
               v-model="form.userAccount"
-              @blur="validateUserAccount"
               placeholder="请输入4-16位字母或数字"
-              class="form-input"
+              clearable
             />
-            <span class="error-message" v-if="errors.userAccount">{{ errors.userAccount }}</span>
-          </div>
+          </el-form-item>
 
           <!-- 密码 -->
-          <div class="form-group">
-            <label for="userPassword">密码</label>
-            <input
-              type="password"
-              id="userPassword"
+          <el-form-item label="密码" prop="userPassword">
+            <el-input
               v-model="form.userPassword"
-              @blur="validateUserPassword"
+              type="password"
               placeholder="请输入6-20位密码"
-              class="form-input"
+              show-password
             />
-            <span class="error-message" v-if="errors.userPassword">{{ errors.userPassword }}</span>
-          </div>
+          </el-form-item>
 
           <!-- 确认密码 -->
-          <div class="form-group">
-            <label for="confirmPassword">确认密码</label>
-            <input
-              type="password"
-              id="confirmPassword"
+          <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input
               v-model="form.confirmPassword"
-              @blur="validateConfirmPassword"
+              type="password"
               placeholder="请再次输入密码"
-              class="form-input"
+              show-password
             />
-            <span class="error-message" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</span>
-          </div>
+          </el-form-item>
+
           <!-- 性别 -->
-          <div class="form-group">
-            <label>性别</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input
-                  type="radio"
-                  v-model="form.gender"
-                  value="male"
-                  checked
-                  class="radio-input"
-                />
-                <span class="radio-custom"></span>
-                <span class="radio-text">男</span>
-              </label>
-              <label class="radio-label">
-                <input
-                  type="radio"
-                  v-model="form.gender"
-                  value="female"
-                  class="radio-input"
-                />
-                <span class="radio-custom"></span>
-                <span class="radio-text">女</span>
-              </label>
-            </div>
-          </div>
+          <el-form-item label="性别" prop="gender">
+            <el-radio-group v-model="form.gender">
+              <el-radio label="male">男</el-radio>
+              <el-radio label="female">女</el-radio>
+            </el-radio-group>
+          </el-form-item>
 
           <!-- 手机号 -->
-          <div class="form-group">
-            <label for="phone">手机号</label>
-            <input
-              type="text"
-              id="phone"
+          <el-form-item label="手机号" prop="phone">
+            <el-input
               v-model="form.phone"
-              @blur="validatePhone"
               placeholder="请输入11位手机号"
-              class="form-input"
+              clearable
             />
-            <span class="error-message" v-if="errors.phone">{{ errors.phone }}</span>
-          </div>
+          </el-form-item>
 
           <!-- 邮箱 -->
-          <div class="form-group">
-            <label for="email">邮箱</label>
-            <input
-              type="email"
-              id="email"
+          <el-form-item label="邮箱" prop="email">
+            <el-input
               v-model="form.email"
-              @blur="validateEmail"
               placeholder="请输入有效邮箱地址"
-              class="form-input"
+              clearable
             />
-            <span class="error-message" v-if="errors.email">{{ errors.email }}</span>
-          </div>
+          </el-form-item>
 
-          <button type="submit" class="submit-btn" :disabled="isSubmitting">
-            {{ isSubmitting ? '注册中...' : '立即注册' }}
-          </button>
+          <el-form-item>
+            <el-button 
+              type="primary" 
+              native-type="submit" 
+              :loading="isSubmitting"
+              class="submit-btn"
+            >
+              {{ isSubmitting ? '注册中...' : '立即注册' }}
+            </el-button>
+          </el-form-item>
           
           <div class="login-link">
             已有账号？<router-link to="/login">立即登录</router-link>
           </div>
-        </form>
+        </el-form>
       </div>
-    </div>
+    </el-card>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'RegisterPage',
-  data() {
-    return {
-      form: {
-        userName: '',
-        userAccount: '',
-        userPassword: '',
-        confirmPassword: '',
-        gender: 'male',
-        phone: '',
-        email: ''
-      },
-      errors: {
-        userName: '',
-        userAccount: '',
-        userPassword: '',
-        confirmPassword: '',
-        phone: '',
-        email: ''
-      },
-      isSubmitting: false
-    }
-  },
-  methods: {
-    validateUserName() {
-      const userNameReg = /^[\u4e00-\u9fa5a-zA-Z0-9_-]{1,16}$/
-      if (!this.form.userName.trim()) {
-        this.errors.userName = '用户名不能为空'
-      } else if (!userNameReg.test(this.form.userName)) {
-        this.errors.userName = '用户名必须为1-16位(支持中文、字母、数字)'
-      } else {
-        this.errors.userName = ''
-      }
-    },
-    validateUserAccount() {
-      const accountReg = /^[a-zA-Z0-9]{4,16}$/
-      if (!this.form.userAccount.trim()) {
-        this.errors.userAccount = '登录账号不能为空'
-      } else if (!accountReg.test(this.form.userAccount)) {
-        this.errors.userAccount = '账号必须为4-16位字母或数字'
-      } else {
-        this.errors.userAccount = ''
-      }
-    },
-    validateUserPassword() {
-      if (!this.form.userPassword) {
-        this.errors.userPassword = '密码不能为空'
-      } else if (this.form.userPassword.length < 6 || this.form.userPassword.length > 20) {
-        this.errors.userPassword = '密码长度应为6-20位'
-      } else {
-        this.errors.userPassword = ''
-        if (this.form.confirmPassword) {
-          this.validateConfirmPassword()
-        }
-      }
-    },
-    validateConfirmPassword() {
-      if (!this.form.confirmPassword) {
-        this.errors.confirmPassword = '请确认密码'
-      } else if (this.form.userPassword !== this.form.confirmPassword) {
-        this.errors.confirmPassword = '两次输入的密码不一致'
-      } else {
-        this.errors.confirmPassword = ''
-      }
-    },
-    validatePhone() {
-      const phoneReg = /^1[3-9]\d{9}$/
-      if (!this.form.phone) {
-        this.errors.phone = '手机号不能为空'
-      } else if (!phoneReg.test(this.form.phone)) {
-        this.errors.phone = '请输入有效的11位手机号'
-      } else {
-        this.errors.phone = ''
-      }
-    },
-    validateEmail() {
-      const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!this.form.email) {
-        this.errors.email = '邮箱不能为空'
-      } else if (!emailReg.test(this.form.email)) {
-        this.errors.email = '请输入有效的邮箱地址'
-      } else {
-        this.errors.email = ''
-      }
-    },
-    validateForm() {
-      this.validateUserName()
-      this.validateUserAccount()
-      this.validateUserPassword()
-      this.validateConfirmPassword()
-      this.validatePhone()
-      this.validateEmail()
-      
-      return Object.values(this.errors).every(error => error === '')
-    },
-    mockApiCall() {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          console.log('注册信息:', this.form)
-          resolve({ success: true })
-        }, 1500)
-      })
-    },
-    showNotification(message, type = 'info') {
-      const titleMap = {
-        success: '成功',
-        warning: '警告',
-        error: '错误',
-        info: '提示'
-      }
-      
-      // 使用Element UI的通知
-      if (this.$notify) {
-        this.$notify({
-          title: titleMap[type] || '提示',
-          message: message,
-          type: type,
-          duration: 2000
-        })
-      } else {
-        // 备用方案
-        alert(`${titleMap[type] || '提示'}: ${message}`)
-      }
-    },
-    navigateBack() {
-      if (this.$router) {
-        if (window.history.length > 1) {
-          this.$router.go(-1)
+<script setup>
+import { ref, reactive } from 'vue'
+import { ElMessage } from 'element-plus'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const registerForm = ref(null)
+
+const form = reactive({
+  userName: '',
+  userAccount: '',
+  userPassword: '',
+  confirmPassword: '',
+  gender: 'male',
+  phone: '',
+  email: ''
+})
+
+const rules = reactive({
+  userName: [
+    { required: true, message: '用户名不能为空', trigger: 'blur' },
+    { pattern: /^[\u4e00-\u9fa5a-zA-Z0-9_-]{1,16}$/, message: '用户名必须为1-16位(支持中文、字母、数字)', trigger: 'blur' }
+  ],
+  userAccount: [
+    { required: true, message: '登录账号不能为空', trigger: 'blur' },
+    { pattern: /^[a-zA-Z0-9]{4,16}$/, message: '账号必须为4-16位字母或数字', trigger: 'blur' }
+  ],
+  userPassword: [
+    { required: true, message: '密码不能为空', trigger: 'blur' },
+    { min: 6, max: 20, message: '密码长度应为6-20位', trigger: 'blur' }
+  ],
+  confirmPassword: [
+    { required: true, message: '请确认密码', trigger: 'blur' },
+    { 
+      validator: (rule, value, callback) => {
+        if (value !== form.userPassword) {
+          callback(new Error('两次输入的密码不一致'))
         } else {
-          this.$router.push('/')
+          callback()
         }
-      } else {
-        console.warn('Router not available')
-        window.location.href = '/' // 备用方案
-      }
-    },
-    async handleSubmit() {
-      if (this.isSubmitting) return
-      
-      if (!this.validateForm()) {
-        this.showNotification('请正确填写所有字段', 'warning')
-        return
-      }
-
-      this.isSubmitting = true
-
-      try {
-        // 模拟API请求 - 实际项目中替换为真实API调用
-        await this.mockApiCall()
-        
-        this.showNotification('注册成功！', 'success')
-        
-        // 延迟0.1秒后返回
-        setTimeout(() => {
-          this.navigateBack()
-        }, 100)
-        
-      } catch (error) {
-        console.error('注册失败:', error)
-        this.showNotification('注册失败，请稍后重试', 'error')
-      } finally {
-        this.isSubmitting = false
-      }
+      },
+      trigger: 'blur'
     }
+  ],
+  phone: [
+    { required: true, message: '手机号不能为空', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入有效的11位手机号', trigger: 'blur' }
+  ],
+  email: [
+    { required: true, message: '邮箱不能为空', trigger: 'blur' },
+    { type: 'email', message: '请输入有效的邮箱地址', trigger: 'blur' }
+  ]
+})
+
+const isSubmitting = ref(false)
+
+const mockApiCall = () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      console.log('注册信息:', form)
+      resolve({ success: true })
+    }, 1500)
+  })
+}
+
+const handleSubmit = async () => {
+  try {
+    await registerForm.value.validate()
+    isSubmitting.value = true
+    
+    // 模拟API请求 - 实际项目中替换为真实API调用
+    await mockApiCall()
+    
+    ElMessage.success('注册成功！')
+    
+    // 延迟0.1秒后返回
+    setTimeout(() => {
+      if (window.history.length > 1) {
+        router.go(-1)
+      } else {
+        router.push('/')
+      }
+    }, 100)
+    
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('注册失败:', error)
+      ElMessage.error('注册失败，请检查表单')
+    }
+  } finally {
+    isSubmitting.value = false
   }
 }
 </script>
@@ -310,7 +202,6 @@ export default {
 }
 
 .register-card {
-  background: white;
   width: 100%;
   max-width: 500px;
   border-radius: 16px;
@@ -335,7 +226,7 @@ export default {
 
 .register-title {
   text-align: center;
-  color: #2c3e50;
+  color: var(--el-text-color-primary);
   margin-bottom: 30px;
   font-size: 28px;
   font-weight: 600;
@@ -371,158 +262,26 @@ export default {
   flex-direction: column;
 }
 
-.form-group {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #34495e;
-  font-size: 14px;
-}
-
-.form-input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  box-sizing: border-box;
-  font-size: 15px;
-  transition: all 0.3s ease;
-  background-color: #f8f9fa;
-}
-
-.form-input:focus {
-  border-color: #3498db;
-  background-color: white;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-  outline: none;
-}
-
-.form-input::placeholder {
-  color: #bdc3c7;
-}
-
-.radio-group {
-  display: flex;
-  gap: 20px;
-  margin-top: 8px;
-}
-
-.radio-label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  padding-left: 28px;
-  user-select: none;
-}
-
-.radio-input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.radio-custom {
-  position: absolute;
-  left: 0;
-  height: 18px;
-  width: 18px;
-  background-color: #f8f9fa;
-  border-radius: 50%;
-  border: 2px solid #bdc3c7;
-  transition: all 0.3s ease;
-}
-
-.radio-label:hover .radio-custom {
-  border-color: #3498db;
-}
-
-.radio-input:checked ~ .radio-custom {
-  background-color: #3498db;
-  border-color: #3498db;
-}
-
-.radio-input:checked ~ .radio-custom::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: white;
-}
-
-.radio-text {
-  margin-left: 8px;
-  color: #34495e;
-  font-size: 14px;
-}
-
-.error-message {
-  color: #e74c3c;
-  font-size: 12px;
-  display: block;
-  margin-top: 6px;
-  animation: shake 0.5s;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-5px); }
-  40%, 80% { transform: translateX(5px); }
-}
-
 .submit-btn {
-  background: linear-gradient(to right, #3498db, #2ecc71);
-  color: white;
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 500;
-  margin-top: 20px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
-
-.submit-btn:active {
-  transform: translateY(0);
-}
-
-.submit-btn:disabled {
-  background: #bdc3c7;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  width: 100%;
+  margin-top: 10px;
 }
 
 .login-link {
   text-align: center;
   margin-top: 20px;
-  color: #7f8c8d;
+  color: var(--el-text-color-secondary);
   font-size: 14px;
 }
 
 .login-link a {
-  color: #3498db;
+  color: var(--el-color-primary);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s;
 }
 
 .login-link a:hover {
-  color: #2980b9;
   text-decoration: underline;
 }
 
