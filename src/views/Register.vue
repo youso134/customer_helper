@@ -100,6 +100,10 @@
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
+import { loginUser } from '@/apis/api'
+import { Register } from '@/apis/api'
+
 
 const router = useRouter()
 const registerForm = ref(null)
@@ -165,30 +169,28 @@ const handleSubmit = async () => {
   try {
     await registerForm.value.validate()
     isSubmitting.value = true
-    
-    // 模拟API请求 - 实际项目中替换为真实API调用
-    await mockApiCall()
-    
-    ElMessage.success('注册成功！')
-    
-    // 延迟0.1秒后返回
-    setTimeout(() => {
-      if (window.history.length > 1) {
-        router.go(-1)
-      } else {
+    // 提交注册信息（不带 uid）
+    const { data } = await Register(form)
+    if (data && data.uid) {
+      // 成功接收 uid，保存到本地
+      console.log('后端返回的 uid:', data.uid)
+      // 示例：保存到 localStorage
+      localStorage.setItem('uid', data.uid)
+      ElMessage.success('注册成功！')
+      setTimeout(() => {
         router.push('/')
-      }
-    }, 100)
-    
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error('注册失败:', error)
-      ElMessage.error('注册失败，请检查表单')
+      }, 100)
+    } else {
+      throw new Error('未收到 UID')
     }
+  } catch (error) {
+    console.error('注册失败:', error)
+    ElMessage.error('注册失败，请检查表单或网络')
   } finally {
     isSubmitting.value = false
   }
 }
+
 </script>
 
 <style scoped>
