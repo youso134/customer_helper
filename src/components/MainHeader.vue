@@ -12,7 +12,7 @@
     <div class="r-content">
       <el-dropdown>
         <span class="el-dropdown-link">
-          <img src="@/assets/images/bird.png" class="user" />
+          <img src="https://api.dicebear.com/9.x/adventurer/svg?seed=Mackenzie" class="user" />
           <span class="username">{{ userStore.user.userName }}</span>
           <el-icon class="el-icon--right">
             <arrow-down />
@@ -72,7 +72,7 @@ onMounted(() => {
   align-items: center;
   width: 100%;
   height: 60px;
-  background-color: #2893E5;
+  background-color: #474b4e;
   // background-color: #2B3037;
 
   .l-content {

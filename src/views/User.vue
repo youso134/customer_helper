@@ -151,11 +151,11 @@ const userInfo = reactive({
   userName: '',
   userRole: '',
   uid: '',
-  avatar: '',
+  avatar: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Mackenzie',
   gender: '',
   birthdate: '',
-  phone: '',
-  email: '',
+  phone: '18055566612',
+  email: '123@qq.com',
   signature: ''
 })
 
@@ -186,18 +186,21 @@ const saveProfile = async () => {
     background: 'rgba(0, 0, 0, 0.7)'
   })
   try {
-    const res = await updateUser(userInfo)
-    if (res.data?.code === 200 || res.code === 200) {
+    const payload = {
+    ...userInfo,
+    // userAccount: 'Cj1234',
+    // userAccount: localStorage.getItem('userAccount')
+    }
+    const res = await updateUser(payload)
+    if (res && res.uid) { // 判断是否返回了有效用户数据
       originalInfo.value = JSON.parse(JSON.stringify(userInfo))
       editMode.value = false
       ElMessage.success('个人信息已保存')
     } else {
-      ElMessage.error(res.data?.message || '保存失败')
+      ElMessage.error('保存失败')
     }
-  } catch {
+  } catch (e) {
     ElMessage.error('保存失败')
-  } finally {
-    loading.close()
   }
 }
 
