@@ -101,7 +101,11 @@ const handleRegister = () => {
   router.push('/register')
 }
 
+
+
 onMounted(() => {
+
+
   // 进入页面前先判断缓存中是否有用户数据，有就直接登录跳转别的页面，没有才进入登录页面。
   let res: any = localStorage.getItem('user')
   if (res !== null) {

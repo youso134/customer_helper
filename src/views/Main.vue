@@ -31,9 +31,8 @@ const router = useRouter()
 onMounted(() => {
   const savedIndex = localStorage.getItem('activeMenuIndex')
   if(savedIndex === '2'){
-    router.push({ name: 'allchatlog' })
+    router.push({ name: 'alldialoglog' })
   }else if(savedIndex === '3') {
-    // router.push('/main/allchatlog')
     router.push({ name: 'chatlog' })
   }
 
@@ -51,11 +50,18 @@ onMounted(() => {
   height: 100vh;
   // width: 100vw;
   background-color: #EFF0F2;
+  overflow: auto;
+  .el-container{
+    height: 100%;
+  }
 
   .el-header,
   .el-main {
     padding: 0;
   }
+  // .el-main{
+  //   height: 80%;
+  // }
 
 }
 </style>

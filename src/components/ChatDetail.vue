@@ -192,11 +192,10 @@ onMounted(() => {
   height: 90%;
   display: flex;
   padding: 0px;
-  margin: 5px;
 
   .chat-detail {
     width: 65%;
-    // width: 800px;
+    overflow: auto;
     height: 500px;
     padding: 15px;
     border: 1px solid #DBDDE3;

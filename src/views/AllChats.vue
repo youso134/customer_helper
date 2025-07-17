@@ -9,7 +9,7 @@
       <!-- 分类筛选 -->
       <div class="filter-category">
         <el-select v-model="sendData.type" placeholder="请选择分类" clearable>
-          <el-option v-for="cat in categoryOptions" :key="cat" :label="cat" :value="cat" />
+          <el-option v-for="cate in categoryOptions" :key="cate" :label="cate" :value="cate" />
         </el-select>
       </div>
 
@@ -18,19 +18,23 @@
 
     <!-- 内容展示区域 -->
     <div class="content">
-      <el-table :data="contentData" style="width: 100%">
+      <el-table :data="rawChatData" style="width: 100%">
+        <el-table-column label="序号" width="80">
+          <template #default="scope">
+            {{ (sendData.currentPage - 1) * sendData.pageSize + scope.$index + 1 }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="cid" label="CID" width="80" />
         <el-table-column prop="did" label="DID" width="80" />
-        <el-table-column prop="clientId" label="客服id" width="80"/>
-        <el-table-column prop="consumerId" label="顾客id" width="80"/>
-        <el-table-column prop="resume" label="简要概括" />
+        <el-table-column prop="clientId" label="客服id" width="80" />
+        <el-table-column prop="consumerId" label="顾客id" width="80" />
+        <el-table-column prop="content" label="内容" />
+        <el-table-column prop="role" label="角色" width="80" />
+        <!-- <el-table-column prop="createTime" label="创建时间" width="160" /> -->
         <el-table-column prop="createTimeFmt" label="创建时间" width="160" />
         <el-table-column prop="editTimeFmt" label="编辑时间" width="160" />
-        <el-table-column prop="type" label="分类" width="80"/>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="200">
           <template #default="scope">
-            <el-button type="primary" size="small" @click="goDetail(scope.$index, scope.row)">
-              详情
-            </el-button>
             <el-button type="primary" size="small" @click="goEdit(scope.$index, scope.row)">
               编辑
             </el-button>
@@ -49,54 +53,55 @@
         @current-change="handleCurrentChange" />
     </div>
 
-    <el-dialog v-model="dialogVisible" title="聊天记录详情" width="1000px" :close-on-click-modal="false">
-      <ChatDetail :rawDialogData="rawDialogData" :rawChatData="rawChatData" />
+
+
+    <el-dialog v-model="dialogVisible" title="编辑信息" width="500px">
+      <el-form :model="editForm" label-width="80px">
+        <el-form-item label="客服ID" v-if="editForm.clientId !== undefined">
+          <el-input v-model="editForm.clientId" />
+        </el-form-item>
+        <el-form-item label="角色" v-if="editForm.role !== undefined">
+
+          <el-select v-model="editForm.role" placeholder="角色">
+            <el-option v-for="cate in roleList" :key="cate" :label="cate" :value="cate" />
+          </el-select>
+
+        </el-form-item>
+        <el-form-item label="内容" v-if="editForm.content !== undefined">
+          <el-input v-model="editForm.content" type="textarea" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitEdit">保存</el-button>
+      </template>
     </el-dialog>
+
 
   </div>
 </template>
 
-<script lang="ts" setup name="AllChatLog">
+<script lang="ts" setup name="AllChats">
 import { ref, onMounted } from 'vue'
-import { getDialoguePage, getDialogueDetailByDid } from '@/apis/api'
+import { getDialoguePage, getTypes } from '@/apis/dialogApi'
 import type { DialogueItem } from '@/stores/types'
-import { useRouter } from 'vue-router'
 
 
-interface ChatItem {
-  type: 'C' | 'U'  // 明确指定只能是这两种值
-  content: string
-}
-const router = useRouter()
-
-const sendData = ref({ pageSize: 5, currentPage: 1, type: '', searchContent: null})
+const sendData = ref({ pageSize: 5, currentPage: 1, type: '', searchContent: null })
 let contentData = ref<DialogueItem[]>([])
 // 所有分类选项（也可以动态生成）
 let categoryOptions: any = []
 const dialogVisible = ref(false)
+const roleList = ['顾客', '客服']
 
-const chatList = ref<ChatItem[]>([])
-const highLight = ref<string[]>([])
 const totalAmount = ref(0)
-
-
-const rawDialogData = {
-  "did": 111,
-  "consumerId": 233,
-  "clientId": 233,
-  "editTime": "2025-07-16T00:38:36.000+00:00",
-  "createTime": "2025-07-15T01:20:02.000+00:00",
-  "type": "投诉",
-  "resume": "客户进行了投诉",
-  "highlight": "投诉"
-}
-const rawChatData = [
+const rawChatData = ref([
   {
     "cid": 1001,
     "did": 111,
     "consumerId": 233,
     "clientId": 233,
-    "content": "您好，保修期是多少",
+    "content": "您好，这里是默认的数据",
     "role": "顾客",
     "sensitiveReason": "保修",
     "editTime": "2025-07-16T00:52:27.000+00:00",
@@ -135,7 +140,10 @@ const rawChatData = [
     "editTime": "2025-07-16T00:52:27.000+00:00",
     "createTime": "2023-05-10T01:19:00.000+00:00"
   }
-]
+])
+
+const editForm = ref<any>({}) // 存储当前编辑的数据
+let editIndex = -1 // 记录当前编辑的行
 
 const handleSizeChange = (val: number) => {
   sendData.value.pageSize = val
@@ -146,41 +154,51 @@ const handleCurrentChange = (val: number) => {
   handleSearch()
 }
 
+const getCate = async () => {
+  // const res = await getTypes();
+  // categoryOptions.value = [...res.filter((item: any) => item !== null)
+  //   .map((item: any) => item.type)]
+
+}
 const handleSearch = async () => {
   // if(sendData.value.type === '') sendData.value.type = null
-  if(sendData.value.searchContent === '') sendData.value.searchContent = null
-  const res = await getDialoguePage(sendData.value)
-  // console.log(res)
-  contentData.value = res.records
-  totalAmount.value = Number(res.total)
-
-  contentData.value = contentData.value.map(item => {
+  if (sendData.value.searchContent === '') sendData.value.searchContent = null
+  try {
+    // const res = await getDialoguePage(sendData.value)
+    // console.log(res)
+    // rawChatData.value = res.records
+    // totalAmount.value = Number(res.total)
+  } catch (error) {
+  }
+  rawChatData.value = rawChatData.value.map(item => {
     return {
       ...item,
       createTimeFmt: formatDate(item.createTime || ''),
       editTimeFmt: formatDate(item.editTime || ''),
     }
   })
+  console.log(contentData.value)
+
 }
-const goDetail = async (index: any, row: any) => {
-  dialogVisible.value = true
-  console.log(index, row)
-  try {
-    const res = await getDialogueDetailByDid({ did: 111 })
-    console.log('222', res)
-  } catch (error) {
-    console.log(error)
+const goEdit = (index: number, row: any) => {
+  editIndex = index
+  // 只取需要修改的字段
+  editForm.value = {
+    content: row.content,
+    role: row.role
   }
-
+  dialogVisible.value = true
 }
-const goEdit = (index: any, row: any) => {
-  localStorage.setItem('activeMenuIndex','3')
-
-  router.push({name:'chatlog'})
-  console.log(index, row)
+const submitEdit = () => {
+  // 只更新修改过的字段
+  // Object.keys(editForm.value).forEach(key => {
+  //   rawChatData.value[editIndex][key] = editForm.value[key]
+  // })
+  dialogVisible.value = false
+  ElMessage.success('修改成功')
 }
-const goDelete = (index: any, row: any) => {
-  console.log(index, row)
+
+const goDelete = async (index: any, row: any) => {
 }
 
 const formatDate = (str: string) => {
@@ -189,36 +207,29 @@ const formatDate = (str: string) => {
   return date.toLocaleString()
 }
 
-// const parseChatData = (rawData: string) => {
-//   // 使用正则表达式分割，匹配 "C:" 或 "U:" 开头的内容
-//   const pattern = /([CU]):\s([^CU]*)/g
-//   let match
-//   const result: ChatItem[] = []
-
-//   while ((match = pattern.exec(rawData)) !== null) {
-//     const type = match[1] as 'C' | 'U'
-//     result.push({
-//       type,
-//       content: match[2].trim()
-//     })
-//   }
-//   chatList.value = result
-// }
-
 onMounted(() => {
-  // parseChatData(rawData)
-  categoryOptions = Array.from(new Set(contentData.value.map(item => item.type)))
+  getCate()
   handleSearch()
 })
 </script>
 
 <style scoped lang="scss">
 .container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  // height: 100vh;
+  padding: 20px;
+  // max-height: 100%;
+  // max-width: 100%;
+  overflow: auto;
+
   .search {
+    display: flex;
+    // flex-shrink: 0;
     height: 60px;
     width: 90%;
-    margin: 20px;
-    display: flex;
+    margin-bottom: 20px;
     align-items: center;
     gap: 20px;
 
@@ -232,14 +243,19 @@ onMounted(() => {
   }
 
   .content {
+    height: 80%;
     width: 90%;
-    margin: 20px;
     overflow: auto;
   }
 
   .demo-pagination-block {
-    margin: 20px;
-    // width: 500px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+
+    // position: sticky; // 粘性布局
+    // bottom: 0; // 粘在底部
   }
 
 }
