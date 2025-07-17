@@ -30,14 +30,19 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/User.vue"),
       },
       {
-        path: "chatlog",
+        path: "chatlog/:did?",
         name: "chatlog",
         component: () => import("@/views/ChatLog.vue"),
       },
       {
-        path: "allchatlog",
-        name: "allchatlog",
-        component: () => import("@/views/AllChatLog.vue"),
+        path: "alldialoglog",
+        name: "alldialoglog",
+        component: () => import("@/views/AllDialogLog.vue"),
+      },
+      {
+        path: "allchats",
+        name: "allchats",
+        component: () => import("@/views/AllChats.vue"),
       },
     ],
   },

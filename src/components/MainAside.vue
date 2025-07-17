@@ -1,5 +1,5 @@
 <template>
-  <el-aside :class="{ collapsed: isCollapse }">
+  <el-aside class="container" :class="{ collapsed: isCollapse }">
     <div class="top-info">
       <el-icon :size="30" color="#FFF">
         <Shop />
@@ -24,7 +24,7 @@
         </el-icon>
         <span>个人信息</span>
       </el-menu-item>
-      <el-menu-item index="2" @click="handleMenu('/main/allchatlog', '2')">
+      <el-menu-item index="2" @click="handleMenu('/main/alldialoglog', '2')">
         <el-icon>
           <Document />
         </el-icon>
@@ -35,6 +35,12 @@
           <UploadFilled />
         </el-icon>
         <span>上传聊天记录</span>
+      </el-menu-item>
+      <el-menu-item index="4" @click="handleMenu('/main/allchats', '4')">
+        <el-icon>
+          <Tickets />
+        </el-icon>
+        <span>所有消息管理</span>
       </el-menu-item>
     </el-menu>
   </el-aside>
@@ -64,12 +70,13 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 const checkMenu = () => {
   const savedIndex = localStorage.getItem('activeMenuIndex')
+  console.log('saveindex:', savedIndex)
   if (savedIndex) {
     currentAside.value = savedIndex
   } else {
     // 根据路径自动匹配一次
     const path = router.currentRoute.value.path
-    if (path.includes('/main/allchatlog')) currentAside.value = '2'
+    if (path.includes('/main/alldialoglog')) currentAside.value = '2'
     else if (path.includes('/main/chatlog')) currentAside.value = '3'
     else currentAside.value = '1'
   }
@@ -78,17 +85,7 @@ const checkMenu = () => {
 
 onMounted(() => {
   checkMenu()
-  // const savedIndex = localStorage.getItem('activeMenuIndex')
-  // console.log(savedIndex)
-  // if (savedIndex) {
-  //   currentAside.value = savedIndex
-  // } else {
-  //   // 根据路径自动匹配一次
-  //   const path = router.currentRoute.value.path
-  //   if (path.includes('/main/chatlog')) currentAside.value = '2'
-  //   else if (path.includes('/main/allchatlog')) currentAside.value = '3'
-  //   else currentAside.value = '1'
-  // }
+
 })
 // onActivated(()=>{
 //   checkMenu()
@@ -98,7 +95,7 @@ onMounted(() => {
 
 
 <style scoped lang="scss">
-.el-aside {
+.container {
   height: 100vh;
   background-color: #2B3037;
   transition: width 0.3s;

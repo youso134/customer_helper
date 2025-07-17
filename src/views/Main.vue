@@ -31,9 +31,8 @@ const router = useRouter()
 onMounted(() => {
   const savedIndex = localStorage.getItem('activeMenuIndex')
   if(savedIndex === '2'){
-    router.push({ name: 'allchatlog' })
+    router.push({ name: 'alldialoglog' })
   }else if(savedIndex === '3') {
-    // router.push('/main/allchatlog')
     router.push({ name: 'chatlog' })
   }
 
@@ -50,21 +49,18 @@ onMounted(() => {
 .main-layout {
   height: 100vh;
   background-color: #EFF0F2;
-
-  .el-container {
+   overflow: auto;
+  .el-container{
     height: 100%;
-
-    .el-header {
-      padding: 0;
-      height: 60px; // 自定义高度
-      line-height: 60px;
-    }
-
-    .el-main {
-      padding: 0;
-      overflow-y: auto;
-      height: calc(100vh - 60px);
-    }
   }
+
+  .el-header,
+  .el-main {
+    padding: 0;
+  }
+  // .el-main{
+  //   height: 80%;
+  // }
+
 }
 </style>

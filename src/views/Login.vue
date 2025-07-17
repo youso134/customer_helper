@@ -77,11 +77,13 @@ const handleLogin = () => {
       try {
 
         let res: any = await loginUser(loginForm)
+        // res = res.data
         if (res && res.userAccount) {
           userStore.setUser(res)
           // localStorage.setItem('user', userStore.user)
           localStorage.setItem('user', JSON.stringify(res))
           router.push('/main')
+          ElMessage.success('成功登陆')
         }
         else {
           // ElMessage.error('登录失败，请检查账号密码')
@@ -99,7 +101,11 @@ const handleRegister = () => {
   router.push('/register')
 }
 
+
+
 onMounted(() => {
+
+
   // 进入页面前先判断缓存中是否有用户数据，有就直接登录跳转别的页面，没有才进入登录页面。
   let res: any = localStorage.getItem('user')
   if (res !== null) {

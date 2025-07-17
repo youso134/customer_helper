@@ -15,7 +15,7 @@ const NETWORK_ERR = "网络错误";
 // 请求拦截器
 service.interceptors.request.use(
   function (config: any) {
-    // 发送请求之前做些什么
+    // 发送请求之前做些什么 
     return config;
   },
   function (error: any) {
@@ -29,6 +29,7 @@ service.interceptors.response.use(
   (res: any) => {
     const { code, data, message } = res.data;
     if (code === 200) {
+      // return res.data;
       return data;
     } else {
       ElMessage.error(message || NETWORK_ERR);
@@ -50,19 +51,12 @@ service.interceptors.response.use(
   }
 );
 
-function request(options: any) {
+function request<T=any>(options: any): Promise<T>  {
   options.method = options.method || "get";
   // 关于get请求参数调整
   if (options.method.toLowerCase() === "get") {
     options.params = options.data;
   }
-
-  // if (config.env === "prod") {
-  //   service.defaults.baseURL = config.baseURL;
-  // } else {
-  //   service.defaults.baseURL = config.baseURL;
-  // }
-
 
   return service(options);
 }
