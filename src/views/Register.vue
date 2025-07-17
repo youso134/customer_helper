@@ -101,8 +101,7 @@ import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import { loginUser } from '@/apis/api'
-import { registerUser } from '@/apis/api'
+import { loginUser,registerUser } from '@/apis/userApi'
 
 
 const router = useRouter()

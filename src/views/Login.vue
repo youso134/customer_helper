@@ -40,7 +40,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useRouter } from 'vue-router'
-import { loginUser } from '../apis/api.ts';
+import { loginUser } from '../apis/userApi.ts';
 import { useUserStore } from '../stores/index.ts';
 
 const router = useRouter()  // 路由跳转

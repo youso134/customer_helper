@@ -140,7 +140,7 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElLoading } from 'element-plus'
 import { Camera, Edit, Check, Close, Lock } from '@element-plus/icons-vue'
-import { getuser, updateUser } from '@/apis/api'
+import { getuser, updateUser } from '@/apis/userApi'
 
 const editMode = ref(false)
 const fileInput = ref(null)

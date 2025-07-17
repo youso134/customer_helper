@@ -1,4 +1,4 @@
-import request from "./request";
+import request from "./request.ts";
 import type {User, Chat, Register, updated} from '../stores/types.ts'
 
 
