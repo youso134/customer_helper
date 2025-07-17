@@ -23,8 +23,8 @@
         <el-table-column prop="clientId" label="客服id" width="80"/>
         <el-table-column prop="consumerId" label="顾客id" width="80"/>
         <el-table-column prop="resume" label="简要概括" />
-        <el-table-column prop="createTime" label="创建时间" width="160" />
-        <el-table-column prop="editTime" label="编辑时间" width="160" />
+        <el-table-column prop="createTimeFmt" label="创建时间" width="160" />
+        <el-table-column prop="editTimeFmt" label="编辑时间" width="160" />
         <el-table-column prop="type" label="分类" width="80"/>
         <el-table-column label="操作">
           <template #default="scope">
@@ -60,13 +60,15 @@
 import { ref, onMounted } from 'vue'
 import { getDialoguePage, getDialogueDetailByDid } from '@/apis/api'
 import type { DialogueItem } from '@/stores/types'
-
+import { useRouter } from 'vue-router'
 
 
 interface ChatItem {
   type: 'C' | 'U'  // 明确指定只能是这两种值
   content: string
 }
+const router = useRouter()
+
 const sendData = ref({ pageSize: 5, currentPage: 1, type: '', searchContent: null})
 let contentData = ref<DialogueItem[]>([])
 // 所有分类选项（也可以动态生成）
@@ -148,15 +150,15 @@ const handleSearch = async () => {
   // if(sendData.value.type === '') sendData.value.type = null
   if(sendData.value.searchContent === '') sendData.value.searchContent = null
   const res = await getDialoguePage(sendData.value)
-  console.log(res)
+  // console.log(res)
   contentData.value = res.records
   totalAmount.value = Number(res.total)
 
   contentData.value = contentData.value.map(item => {
     return {
       ...item,
-      createTime: formatDate(item.createTime || ''),
-      editTime: formatDate(item.editTime || ''),
+      createTimeFmt: formatDate(item.createTime || ''),
+      editTimeFmt: formatDate(item.editTime || ''),
     }
   })
 }
@@ -172,6 +174,9 @@ const goDetail = async (index: any, row: any) => {
 
 }
 const goEdit = (index: any, row: any) => {
+  localStorage.setItem('activeMenuIndex','3')
+
+  router.push({name:'chatlog'})
   console.log(index, row)
 }
 const goDelete = (index: any, row: any) => {
@@ -184,30 +189,26 @@ const formatDate = (str: string) => {
   return date.toLocaleString()
 }
 
-const parseChatData = (rawData: string) => {
-  // 使用正则表达式分割，匹配 "C:" 或 "U:" 开头的内容
-  const pattern = /([CU]):\s([^CU]*)/g
-  let match
-  const result: ChatItem[] = []
+// const parseChatData = (rawData: string) => {
+//   // 使用正则表达式分割，匹配 "C:" 或 "U:" 开头的内容
+//   const pattern = /([CU]):\s([^CU]*)/g
+//   let match
+//   const result: ChatItem[] = []
 
-  while ((match = pattern.exec(rawData)) !== null) {
-    const type = match[1] as 'C' | 'U'
-    result.push({
-      type,
-      content: match[2].trim()
-    })
-  }
-  chatList.value = result
-}
-const getDialogMsg = async () => {
-
-}
+//   while ((match = pattern.exec(rawData)) !== null) {
+//     const type = match[1] as 'C' | 'U'
+//     result.push({
+//       type,
+//       content: match[2].trim()
+//     })
+//   }
+//   chatList.value = result
+// }
 
 onMounted(() => {
   // parseChatData(rawData)
   categoryOptions = Array.from(new Set(contentData.value.map(item => item.type)))
   handleSearch()
-  getDialogMsg()
 })
 </script>
 

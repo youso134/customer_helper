@@ -64,6 +64,7 @@ const handleClose = (key: string, keyPath: string[]) => {
 
 const checkMenu = () => {
   const savedIndex = localStorage.getItem('activeMenuIndex')
+  console.log('saveindex:',savedIndex)
   if (savedIndex) {
     currentAside.value = savedIndex
   } else {
