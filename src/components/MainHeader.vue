@@ -72,7 +72,7 @@ onMounted(() => {
   align-items: center;
   width: 100%;
   height: 60px;
-  background-color: #474b4e;
+  background-color: #2893E5;
   // background-color: #2B3037;
 
   .l-content {
