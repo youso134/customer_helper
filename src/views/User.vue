@@ -278,7 +278,23 @@ const submitPasswordChange = async () => {
 }
 
 const getUserInfo = async () => {
-  const userAccount = 'Cj1234'
+  const userStr = localStorage.getItem('user')
+  if (!userStr) {
+    ElMessage.warning('未找到用户信息，请重新登录')
+    return
+  }
+  let userAccount = ''
+  try {
+    const user = JSON.parse(userStr)
+    userAccount = user?.userAccount || ''
+  } catch (e) {
+    ElMessage.error('用户信息解析失败')
+    return
+  }
+  if (!userAccount) {
+    ElMessage.warning('用户账号缺失')
+    return
+  }
   try {
     const res = await getuser(userAccount)
     console.log('后端响应结果:', res)
