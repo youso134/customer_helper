@@ -58,7 +58,7 @@
 
 
 <script lang='ts' setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 // import { Avatar, User } from '@element-plus/icons-vue'
 import { addChatByBatch } from '@/apis/chatApi'
 import { getDialogueDetailByDid } from '@/apis/dialogApi'
