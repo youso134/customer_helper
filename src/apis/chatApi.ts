@@ -25,9 +25,29 @@ export function getDialoguePage(data:any) {
 }
 
 
-export function addChatByBatch(data:any) {
+export function addOrUpdateChatByBatch(data:any) {
   return request({
-    url: "/chat/addChatByBatch",
+    url: "/chat/addOrUpdateChatByBatch",
+    method: "post",
+    headers: {
+      "Content-Type": "application/json", 
+    },
+    data: JSON.stringify(data)
+  });
+}
+
+export function getAllChat() {
+  return request({
+    url: "/chat/getAllChat",
+    method: "get",
+    // headers: {
+    //   "Content-Type": "application/json", 
+    // },
+  });
+}
+export function deleteByCid(data:any) {
+  return request({
+    url: "/chat/deleteByCid",
     method: "post",
     headers: {
       "Content-Type": "application/json", 

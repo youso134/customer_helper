@@ -79,7 +79,7 @@ interface ChatItem {
 }
 const router = useRouter()
 
-const sendData = ref({ pageSize: 5, currentPage: 1, type: '', searchContent: null })
+const sendData = ref({ pageSize: 20, currentPage: 1, type: '', searchContent: null })
 let contentData = ref<DialogueItem[]>([])
 // 所有分类选项（也可以动态生成）
 let categoryOptions = ref<string[]>([])
@@ -149,7 +149,6 @@ const rawChatData = ref([
 ])
 
 const getCate = async () => {
-  console.log('111')
   const res = await getTypes();
   categoryOptions.value = [...res.filter((item: any) => item !== null)
     .map((item: any) => item.type)]
@@ -167,7 +166,6 @@ const handleSearch = async () => {
   // if(sendData.value.type === '') sendData.value.type = null
   if (sendData.value.searchContent === '') sendData.value.searchContent = null
   const res = await getDialoguePage(sendData.value)
-  // console.log(res)
   contentData.value = res.records
   totalAmount.value = Number(res.total)
 
@@ -183,11 +181,9 @@ const goDetail = async (index: any, row: any) => {
   dialogVisible.value = true
   try {
     const res = await getDialogueDetailByDid({ did: row.did })
-    console.log(res)
     rawDialogData.value = res.dialogueVO
     rawChatData.value = res.chatVOList
   } catch (error) {
-    // console.log(error)
   }
 
 }
@@ -203,7 +199,7 @@ const goEdit = (index: any, row: any) => {
 const goDelete = async (index: any, row: any) => {
   try {
     const res = await deleteByDid({ did: row.did })
-    console.log(res)
+    ElMessage.success('删除成功！')
     handleSearch()
   } catch (error) {
   }
@@ -214,22 +210,6 @@ const formatDate = (str: string) => {
   const date = new Date(str)
   return date.toLocaleString()
 }
-
-// const parseChatData = (rawData: string) => {
-//   // 使用正则表达式分割，匹配 "C:" 或 "U:" 开头的内容
-//   const pattern = /([CU]):\s([^CU]*)/g
-//   let match
-//   const result: ChatItem[] = []
-
-//   while ((match = pattern.exec(rawData)) !== null) {
-//     const type = match[1] as 'C' | 'U'
-//     result.push({
-//       type,
-//       content: match[2].trim()
-//     })
-//   }
-//   chatList.value = result
-// }
 
 onMounted(() => {
   // parseChatData(rawData)
