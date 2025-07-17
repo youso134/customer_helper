@@ -49,13 +49,22 @@ onMounted(() => {
 <style scoped lang="scss">
 .main-layout {
   height: 100vh;
-  // width: 100vw;
   background-color: #EFF0F2;
 
-  .el-header,
-  .el-main {
-    padding: 0;
-  }
+  .el-container {
+    height: 100%;
 
+    .el-header {
+      padding: 0;
+      height: 60px; // 自定义高度
+      line-height: 60px;
+    }
+
+    .el-main {
+      padding: 0;
+      overflow-y: auto;
+      height: calc(100vh - 60px);
+    }
+  }
 }
 </style>

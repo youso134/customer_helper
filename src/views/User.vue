@@ -3,8 +3,8 @@
     <el-card class="profile-card">
       <h1 class="page-title">个人信息中心</h1>
 
-      <!-- 用户头像部分 -->
-      <div class="avatar-section">
+      <!-- 头像和 UID -->
+      <div class="avatar-section column-layout">
         <div class="avatar-wrapper" @click="triggerFileInput">
           <el-avatar :size="100" :src="userInfo.avatar" class="avatar-img" />
           <div class="avatar-overlay">
@@ -17,89 +17,106 @@
             accept="image/*"
             @change="handleAvatarChange"
             class="file-input"
-          >
+          />
         </div>
-        <div class="user-info">
-          <h2 class="userName">{{ userInfo.userName }}</h2>
-          <el-tag type="info" class="user-role">{{ userInfo.userRole }}</el-tag>
+        <div class="basic-info">
+          <!-- UID 保留显示 -->
+          <p class="uid">UID:{{ userInfo.uid }}</p>
+          <p class="role">身份: {{ userInfo.userRole }}</p>
         </div>
       </div>
 
-      <!-- 基本信息表单 -->
-      <div class="form-section">
-        <el-form
-          :model="userInfo"
-          :rules="rules"
-          ref="userForm"
-          label-position="top"
-        >
-          <div class="form-row">
-            <el-form-item label="用户名" prop="userName">
-              <el-input
-                v-model="userInfo.userName"
-                placeholder="请输入用户名"
-                :disabled="!editMode"
-              />
-            </el-form-item>
+      <!-- 信息展示区域 -->
+      <div class="info-display">
+        <!-- 用户名 -->
+        <p>
+          <strong>用户名：</strong>
+          <template v-if="!editMode">{{ userInfo.userName }}</template>
+          <template v-else>
+            <el-input v-model="userInfo.userName" size="small" style="width: 200px" />
+          </template>
+        </p>
 
-            <el-form-item label="性别" prop="gender">
-              <el-select
-                v-model="userInfo.gender"
-                placeholder="请选择性别"
-                :disabled="!editMode"
-              >
-                <el-option label="男" value="男" />
-                <el-option label="女" value="女" />
-                <el-option label="保密" value="保密" />
-              </el-select>
-            </el-form-item>
-          </div>
+        <!-- 性别 -->
+        <p>
+          <strong>性别：</strong>
+          <template v-if="!editMode">{{ userInfo.gender }}</template>
+          <template v-else>
+            <el-select v-model="userInfo.gender" placeholder="请选择" size="small" style="width: 150px">
+              <el-option label="男" value="男" />
+              <el-option label="女" value="女" />
+              <el-option label="保密" value="保密" />
+            </el-select>
+          </template>
+        </p>
 
-          <div class="form-row">
-            <el-form-item label="手机号" prop="phone">
-              <el-input
-                v-model="userInfo.phone"
-                placeholder="请输入手机号"
-                :disabled="!editMode"
-              />
-            </el-form-item>
+        <!-- 出生年月 -->
+        <p>
+          <strong>出生年月：</strong>
+          <template v-if="!editMode">{{ userInfo.birthdate }}</template>
+          <template v-else>
+            <el-date-picker
+              v-model="userInfo.birthdate"
+              type="date"
+              value-format="YYYY-MM-DD"
+              placeholder="请选择日期"
+              size="small"
+              style="width: 180px"
+            />
+          </template>
+        </p>
 
-            <el-form-item label="邮箱" prop="email">
-              <el-input
-                v-model="userInfo.email"
-                placeholder="请输入邮箱"
-                :disabled="!editMode"
-              />
-            </el-form-item>
-          </div>
+        <!-- 手机号 -->
+        <p>
+          <strong>手机号：</strong>
+          <template v-if="!editMode">{{ userInfo.phone }}</template>
+          <template v-else>
+            <el-input v-model="userInfo.phone" size="small" style="width: 200px" />
+          </template>
+        </p>
 
-          <div class="form-actions">
-            <template v-if="!editMode">
-              <el-button type="primary" @click="enterEditMode" :icon="Edit">编辑信息</el-button>
-              <el-button type="warning" @click="openPasswordDialog" :icon="Lock">修改密码</el-button>
-            </template>
-            <template v-else>
-              <el-button type="primary" @click="saveProfile" :icon="Check">保存修改</el-button>
-              <el-button @click="cancelEdit" :icon="Close">取消</el-button>
-            </template>
-          </div>
-        </el-form>
+        <!-- 邮箱 -->
+        <p>
+          <strong>邮箱：</strong>
+          <template v-if="!editMode">{{ userInfo.email }}</template>
+          <template v-else>
+            <el-input v-model="userInfo.email" size="small" style="width: 250px" />
+          </template>
+        </p>
+
+        <!-- 个性签名 -->
+        <p>
+          <strong>个性签名：</strong>
+          <template v-if="!editMode">{{ userInfo.signature }}</template>
+          <template v-else>
+            <el-input
+              v-model="userInfo.signature"
+              type="textarea"
+              :rows="2"
+              maxlength="100"
+              show-word-limit
+              style="width: 100%"
+            />
+          </template>
+        </p>
+      </div>
+
+      <!-- 按钮区域 -->
+      <div class="form-actions">
+        <template v-if="!editMode">
+          <el-button type="primary" @click="enterEditMode" :icon="Edit">编辑信息</el-button>
+          <el-button type="warning" @click="openPasswordDialog" :icon="Lock">修改密码</el-button>
+        </template>
+        <template v-else>
+          <el-button type="primary" @click="saveProfile" :icon="Check">保存修改</el-button>
+          <el-button @click="cancelEdit" :icon="Close">取消</el-button>
+        </template>
       </div>
     </el-card>
 
     <!-- 修改密码弹窗 -->
-    <el-dialog
-      v-model="showPasswordDialog"
-      title="修改密码"
-      width="400px"
-      :close-on-click-modal="false"
-    >
-      <el-form
-        :model="passwordForm"
-        :rules="passwordRules"
-        ref="passwordFormRef"
-        label-position="top"
-      >
+    <el-dialog v-model="showPasswordDialog" title="修改密码" width="400px" :close-on-click-modal="false">
+      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-position="top">
         <el-form-item label="原密码" prop="oldPassword">
           <el-input v-model="passwordForm.oldPassword" type="password" />
         </el-form-item>
@@ -122,49 +139,68 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElLoading } from 'element-plus'
-import axios from 'axios'
 import { Camera, Edit, Check, Close, Lock } from '@element-plus/icons-vue'
-import { updateUser, getuser } from '@/apis/api'
+import { getuser, updateUser } from '@/apis/api'
 
 const editMode = ref(false)
 const fileInput = ref(null)
-const userForm = ref(null)
+const originalInfo = ref({})
+const tempInfo = ref({})
 
 const userInfo = reactive({
   userName: '',
   userRole: '',
+  uid: '',
   avatar: '',
   gender: '',
+  birthdate: '',
   phone: '',
-  email: ''
+  email: '',
+  signature: ''
 })
 
-const originalInfo = ref({})
-const tempInfo = ref({})
-
-// 校验规则
-const validatePhone = (rule, value, callback) => {
-  if (!value) return callback(new Error('请输入手机号'))
-  if (!/^1[3-9]\d{9}$/.test(value)) return callback(new Error('手机号格式不正确'))
-  callback()
+const validateBeforeSave = () => {
+  const phoneReg = /^1[3-9]\d{9}$/
+  const emailReg = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
+  if (!userInfo.userName) return ElMessage.error('用户名不能为空')
+  if (!phoneReg.test(userInfo.phone)) return ElMessage.error('手机号格式不正确')
+  if (!emailReg.test(userInfo.email)) return ElMessage.error('邮箱格式不正确')
+  return true
 }
 
-const validateEmail = (rule, value, callback) => {
-  if (!value) return callback(new Error('请输入邮箱'))
-  if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value)) return callback(new Error('邮箱格式不正确'))
-  callback()
+const enterEditMode = () => {
+  tempInfo.value = JSON.parse(JSON.stringify(userInfo))
+  editMode.value = true
 }
 
-const rules = reactive({
-  userName: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 2, max: 12, message: '长度在 2 到 12 个字符', trigger: 'blur' }
-  ],
-  phone: [{ validator: validatePhone, trigger: 'blur' }],
-  email: [{ validator: validateEmail, trigger: 'blur' }]
-})
+const cancelEdit = () => {
+  Object.assign(userInfo, JSON.parse(JSON.stringify(tempInfo.value)))
+  editMode.value = false
+}
 
-// 文件上传
+const saveProfile = async () => {
+  if (!validateBeforeSave()) return
+  const loading = ElLoading.service({
+    lock: true,
+    text: '保存中...',
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
+  try {
+    const res = await updateUser(userInfo)
+    if (res.data?.code === 200 || res.code === 200) {
+      originalInfo.value = JSON.parse(JSON.stringify(userInfo))
+      editMode.value = false
+      ElMessage.success('个人信息已保存')
+    } else {
+      ElMessage.error(res.data?.message || '保存失败')
+    }
+  } catch {
+    ElMessage.error('保存失败')
+  } finally {
+    loading.close()
+  }
+}
+
 const triggerFileInput = () => fileInput.value.click()
 
 const handleAvatarChange = (e) => {
@@ -181,41 +217,7 @@ const handleAvatarChange = (e) => {
   reader.readAsDataURL(file)
 }
 
-// 编辑模式
-const enterEditMode = () => {
-  tempInfo.value = JSON.parse(JSON.stringify(userInfo))
-  editMode.value = true
-}
-
-const saveProfile = async () => {
-  try {
-    await userForm.value.validate()
-    const loading = ElLoading.service({
-      lock: true,
-      text: '保存中...',
-      background: 'rgba(0, 0, 0, 0.7)'
-    })
-    const res = await updateUser(userInfo)
-    if (res.data?.code === 200 || res.code === 200) {
-      originalInfo.value = JSON.parse(JSON.stringify(userInfo))
-      editMode.value = false
-      ElMessage.success('个人信息已保存')
-    } else {
-      ElMessage.error(res.data?.message || '保存失败')
-    }
-  } catch (error) {
-    ElMessage.error('请检查表单填写是否正确')
-  } finally {
-    ElLoading.service().close()
-  }
-}
-
-const cancelEdit = () => {
-  Object.assign(userInfo, JSON.parse(JSON.stringify(tempInfo.value)))
-  editMode.value = false
-}
-
-// 修改密码逻辑
+// 修改密码
 const showPasswordDialog = ref(false)
 const passwordFormRef = ref(null)
 const passwordForm = reactive({
@@ -255,15 +257,14 @@ const openPasswordDialog = () => {
 const submitPasswordChange = async () => {
   try {
     await passwordFormRef.value.validate()
-
     const loading = ElLoading.service({ lock: true, text: '修改中...', background: 'rgba(0, 0, 0, 0.7)' })
 
-    // 模拟后端密码验证逻辑
+    // 模拟密码验证
     if (passwordForm.oldPassword !== '123456') {
-      throw new Error('原密码错误') // 模拟验证失败
+      throw new Error('原密码错误')
     }
 
-    await new Promise(resolve => setTimeout(resolve, 1000)) // 模拟 API 延迟
+    await new Promise(resolve => setTimeout(resolve, 1000))
     ElMessage.success('密码修改成功')
     showPasswordDialog.value = false
     loading.close()
@@ -273,51 +274,31 @@ const submitPasswordChange = async () => {
   }
 }
 
-const getUserInfo = async () =>{
-  const userStr = localStorage.getItem('user')
-  if (!userStr) {
-    ElMessage.error('用户未登录，请重新登录')
-    return
-  }
-
-  let uid = null
+const getUserInfo = async () => {
+  const userAccount = 'Cj1234'
   try {
-    const user = JSON.parse(userStr)
-    uid = user?.uid
-  } catch (e) {
-    ElMessage.error('用户信息解析失败,请重新登录')
-    return
-  }
-
-  if (!uid) {
-    ElMessage.error('用户ID缺失,请重新登录')
-    return
-  }
-
-  try {
-    console.log(uid)
-    const res = await getuser(uid)
-
-
-    ElMessage.info('111')
-    if (res.data?.code === 200 || res.code === 200) {
-      const data = res.data?.data || res.data
+    const res = await getuser(userAccount)
+    console.log('后端响应结果:', res)
+    // 判断方式：直接判断是否存在 uid 或 userName 等关键字段
+    const data = res?.data || res
+    if (data && data.uid) {
       Object.assign(userInfo, data)
       originalInfo.value = JSON.parse(JSON.stringify(userInfo))
-      tempInfo.value = JSON.parse(JSON.stringify(userInfo))
+      console.log('用户信息已加载')
     } else {
-      ElMessage.error(res.data?.message || '获取用户信息失败')
+      ElMessage.error('后端数据结构不符合预期')
     }
-  } catch (error) {
+  } catch (err) {
+    console.error('请求错误:', err)
     ElMessage.error('获取用户信息出错')
   }
 }
 
-// 初始化数据：从 localStorage 获取 uid，并请求用户信息
-onMounted(()=>{
+onMounted(() => {
   getUserInfo()
 })
 </script>
+
 
 <style scoped lang="scss">
 .app-container {
@@ -394,6 +375,45 @@ onMounted(()=>{
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+.column-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.basic-info {
+  margin-top: 10px;
+
+  .userName {
+    font-size: 22px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 5px;
+  }
+  .role {
+    font-size: 16px;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+  }
+
+  .uid {
+    font-size: 14px;
+    color: #7f8c8d;
+  }
+}
+
+.info-display {
+  margin-top: 30px;
+  line-height: 2;
+  font-size: 16px;
+  color: #34495e;
+  padding: 0 20px;
+
+  p {
+    margin: 5px 0;
+  }
 }
 
 /* 头像覆盖层 */

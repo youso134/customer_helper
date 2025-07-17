@@ -46,13 +46,13 @@ export function updateUser(data: updated){
   });
 }
 
-export function getuser(uid:number) {
+export function getuser(userAccount:any) {
   return request({
-    url: "/user/getLoginUser",
-    method: "get",
+    url: "/user/getLoginUserByAccount",
+    method: "post",
     headers: {
       "Content-Type": "application/json", 
     },
-    data: JSON.stringify({'uid':uid})
+    data: JSON.stringify({'userAccount':userAccount})
   });
 }
