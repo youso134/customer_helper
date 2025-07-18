@@ -28,6 +28,8 @@
         <el-table-column prop="clientId" label="客服id" width="80" />
         <el-table-column prop="consumerId" label="顾客id" width="80" />
         <el-table-column prop="resume" label="简要概括" />
+        <el-table-column prop="sensitiveReason" label="敏感词" width="80" />
+
         <el-table-column prop="createTimeFmt" label="创建时间" width="160" />
         <el-table-column prop="editTimeFmt" label="编辑时间" width="160" />
         <el-table-column prop="type" label="分类" width="80" />
@@ -185,7 +187,7 @@ const goEdit = (index: any, row: any) => {
   // localStorage.setItem('activeMenuIndex', '3')
   // currentDg.setCurrentDialog(row)
   router.push({
-    name: 'chatlog', params: {
+    name: 'addoreditchat', params: {
       did: row.did
     }
   })

@@ -30,6 +30,7 @@
         <el-table-column prop="consumerId" label="顾客id" width="80" />
         <el-table-column prop="content" label="内容" />
         <el-table-column prop="role" label="角色" width="80" />
+        <el-table-column prop="sensitiveReason" label="敏感词" width="80" />
         <!-- <el-table-column prop="createTime" label="创建时间" width="160" /> -->
         <el-table-column prop="createTimeFmt" label="创建时间" width="160" />
         <el-table-column prop="editTimeFmt" label="编辑时间" width="160" />
@@ -57,9 +58,9 @@
 
     <el-dialog v-model="dialogVisible" title="编辑信息" width="500px">
       <el-form :model="editForm" label-width="80px">
-        <el-form-item label="客服ID" v-if="editForm.clientId !== undefined">
+        <!-- <el-form-item label="客服ID" v-if="editForm.clientId !== undefined">
           <el-input v-model="editForm.clientId" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="角色" v-if="editForm.role !== undefined">
 
           <el-select v-model="editForm.role" placeholder="角色">
@@ -68,7 +69,7 @@
 
         </el-form-item>
         <el-form-item label="内容" v-if="editForm.content !== undefined">
-          <el-input v-model="editForm.content" type="textarea" />
+          <el-input v-model="editForm.content" type="textarea" style="height: 400px;" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -83,11 +84,11 @@
 
 <script lang="ts" setup name="AllChats">
 import { ref, onMounted } from 'vue'
-import { getChatPage, deleteByCid } from '@/apis/chatApi'
+import { getChatPage, deleteByCid, updateByCid } from '@/apis/chatApi'
 import type { DialogueItem } from '@/stores/types'
 
 
-const sendData = ref({ pageSize: 5, currentPage: 1, type: '', searchContent: null })
+const sendData = ref({ pageSize: 10, currentPage: 1, type: '', searchContent: null })
 let contentData = ref<DialogueItem[]>([])
 // 所有分类选项（也可以动态生成）
 let categoryOptions: any = []
@@ -164,7 +165,6 @@ const handleSearch = async () => {
   if (sendData.value.searchContent === '') sendData.value.searchContent = null
   try {
     const res = await getChatPage(sendData.value)
-    console.log(res)
     rawChatData.value = res.records
     totalAmount.value = Number(res.total)
   } catch (error) {
@@ -177,25 +177,33 @@ const handleSearch = async () => {
       editTimeFmt: formatDate(item.editTime || ''),
     }
   })
-  console.log(contentData.value)
-
 }
 const goEdit = (index: number, row: any) => {
   editIndex = index
   // 只取需要修改的字段
   editForm.value = {
+    cid: row.cid,
+    consumerId: row.consumerId,
+    clientId: row.clientId,
     content: row.content,
     role: row.role
   }
   dialogVisible.value = true
 }
-const submitEdit = () => {
+const submitEdit = async () => {
   // 只更新修改过的字段
   // Object.keys(editForm.value).forEach(key => {
   //   rawChatData.value[editIndex][key] = editForm.value[key]
   // })
   dialogVisible.value = false
-  ElMessage.success('修改成功')
+  try {
+    const res = await updateByCid(editForm.value)
+    ElMessage.success('修改成功')
+    handleSearch()
+  } catch (error) {
+    ElMessage.error("提交出错了")
+  }
+  
 }
 
 const goDelete = async (index: any, row: any) => {

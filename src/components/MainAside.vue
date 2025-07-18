@@ -32,9 +32,13 @@
         <el-icon><Document /></el-icon>
         <span>查看全部聊天记录</span>
       </el-menu-item>
-      <el-menu-item index="/main/chatlog">
+      <el-menu-item index="/main/addoreditchat">
         <el-icon><UploadFilled /></el-icon>
-        <span>上传聊天记录</span>
+        <span>编辑聊天记录</span>
+      </el-menu-item>
+      <el-menu-item index="/main/addchats">
+        <el-icon><UploadFilled /></el-icon>
+        <span>批量添加聊天记录</span>
       </el-menu-item>
       <el-menu-item index="/main/allchats">
         <el-icon><Tickets /></el-icon>

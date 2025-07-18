@@ -38,10 +38,16 @@ const routes: Array<RouteRecordRaw> = [
         meta: { menuIndex: "/main/alldialoglog" },
       },
       {
-        path: "chatlog/:did?",
-        name: "chatlog",
-        component: () => import("@/views/ChatLog.vue"),
-        meta: { menuIndex: "/main/chatlog" },
+        path: "addoreditchat/:did?",
+        name: "addoreditchat",
+        component: () => import("@/views/AddorEditChat.vue"),
+        meta: { menuIndex: "/main/addoreditchat" },
+      },
+      {
+        path: "addchats",
+        name: "addchats",
+        component: () => import("@/views/AddChats.vue"),
+        meta: { menuIndex: "/main/addchats" },
       },
       {
         path: "allchats",
