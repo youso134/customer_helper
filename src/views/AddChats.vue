@@ -241,8 +241,6 @@ const handleFileChange = async (event: Event) => {
       rawChatData.value = mappedData
       consumerId.value = rawChatData.value[0].consumerId
       clientId.value = rawChatData.value[0].clientId
-      consumerLocked.value = true
-      clientLocked.value = true
       ElMessage.success('Excel 数据已成功加载！')
     }
 

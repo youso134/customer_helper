@@ -24,7 +24,7 @@
             {{ (sendData.currentPage - 1) * sendData.pageSize + scope.$index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column prop="did" label="DID" width="80" />
+        <el-table-column prop="did" label="聊天记录did" width="120" />
         <el-table-column prop="clientId" label="客服id" width="80" />
         <el-table-column prop="consumerId" label="顾客id" width="80" />
         <el-table-column prop="resume" label="简要概括" />
