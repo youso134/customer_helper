@@ -4,10 +4,19 @@
       <el-button size="small" class="menu-btn">
         <component class="icons" is="menu"></component>
       </el-button>
+
+      <!-- 面包屑 -->
       <el-breadcrumb separator="/" class="bread">
-        <el-breadcrumb-item :to="{ path: '/main' }">主页</el-breadcrumb-item>
+        <el-breadcrumb-item
+          v-for="(item, index) in breadcrumbList"
+          :key="index"
+          :to="item.path"
+        >
+          {{ item.meta.title }}
+        </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
+
     <div class="r-content">
       <el-dropdown>
         <span class="el-dropdown-link">
@@ -32,24 +41,29 @@
 </template>
 
 <script setup lang="ts" name="MainHeader">
-import { useRouter } from 'vue-router'
+import { onMounted, computed } from 'vue'
+import { useRouter, useRoute, RouteRecordNormalized } from 'vue-router'
 import { useUserStore } from '../stores'
-import { onMounted } from 'vue'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 
 const handleUser = () => {
   localStorage.setItem('activeMenuIndex', '1')
-  router.push({ path: '/main' })
+  router.push({ path: '/main/user' })
 }
 
 const handleLogout = () => {
   localStorage.removeItem('user')
-  // localStorage.removeItem('activeMenuIndex')
   userStore.clearUser()
   router.push('/')
 }
+
+// 生成面包屑列表
+const breadcrumbList = computed(() => {
+  return route.matched.filter((r: RouteRecordNormalized) => r.meta && r.meta.title)
+})
 
 onMounted(() => {
   const res = localStorage.getItem('user')
@@ -102,6 +116,10 @@ onMounted(() => {
 
       ::v-deep(.el-breadcrumb__inner) {
         color: #cfd8dc !important;
+      }
+
+      ::v-deep(.el-breadcrumb__item) {
+        font-weight: 500;
       }
     }
   }
