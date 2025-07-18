@@ -115,24 +115,59 @@
     </el-card>
 
     <!-- 修改密码弹窗 -->
-    <el-dialog v-model="showPasswordDialog" title="修改密码" width="400px" :close-on-click-modal="false">
-      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-position="top">
+    <!-- 修改密码弹窗 -->
+    <el-dialog
+      v-model="showPasswordDialog"
+      title="🔒 修改密码"
+      width="450px"
+      class="password-dialog"
+      :close-on-click-modal="false"
+      @close="resetPasswordDialog"
+    >
+      <el-form
+        :model="passwordForm"
+        :rules="passwordRules"
+        ref="passwordFormRef"
+        label-position="top"
+        class="password-form"
+      >
         <el-form-item label="原密码" prop="userPassword">
-          <el-input v-model="passwordForm.userPassword" type="password" />
+          <el-input
+            v-model="passwordForm.userPassword"
+            type="password"
+            placeholder="请输入原密码"
+            size="medium"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="新密码" prop="userNewPassword">
-          <el-input v-model="passwordForm.userNewPassword" type="password" />
+          <el-input
+            v-model="passwordForm.userNewPassword"
+            type="password"
+            placeholder="请输入新密码"
+            size="medium"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="确认新密码" prop="confirmPassword">
-          <el-input v-model="passwordForm.confirmPassword" type="password" />
+          <el-input
+            v-model="passwordForm.confirmPassword"
+            type="password"
+            placeholder="再次输入新密码"
+            size="medium"
+            clearable
+          />
         </el-form-item>
       </el-form>
 
       <template #footer>
-        <el-button @click="showPasswordDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitPasswordChange">确认修改</el-button>
+        <div class="password-dialog-footer">
+          <el-button @click="showPasswordDialog = false">取消</el-button>
+          <el-button type="primary" @click="submitPasswordChange">确认修改</el-button>
+        </div>
       </template>
     </el-dialog>
+
   </div>
 </template>
 
@@ -159,6 +194,13 @@ const userInfo = reactive({
   email: '',
   signature: ''
 })
+
+const resetPasswordDialog = () => {
+  passwordForm.userPassword = ''
+  passwordForm.userNewPassword = ''
+  passwordForm.confirmPassword = ''
+  passwordFormRef.value?.resetFields()
+}
 
 const validateBeforeSave = () => {
   const phoneReg = /^1[3-9]\d{9}$/
@@ -276,8 +318,12 @@ const openPasswordDialog = () => {
   passwordForm.userNewPassword = ''
   passwordForm.confirmPassword = ''
   showPasswordDialog.value = true
-}
 
+  // ✨ 清空校验状态和错误提示
+  nextTick(() => {
+    passwordFormRef.value?.resetFields()
+  })
+}
 const submitPasswordChange = async () => {
   try {
     await passwordFormRef.value.validate()
@@ -605,6 +651,32 @@ onMounted(() => {
     margin-bottom: 15px;
   }
   
+}
+.password-dialog {
+  .el-dialog__header {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .password-form {
+    padding: 10px 5px;
+
+    .el-form-item {
+      margin-bottom: 20px;
+
+      .el-input {
+        width: 100%;
+      }
+    }
+  }
+
+  .password-dialog-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px 0;
+  }
 }
 
 </style>
