@@ -83,7 +83,7 @@
 
 <script lang="ts" setup name="AllChats">
 import { ref, onMounted } from 'vue'
-import { getDialoguePage, getTypes } from '@/apis/dialogApi'
+import { getChatPage, deleteByCid } from '@/apis/chatApi'
 import type { DialogueItem } from '@/stores/types'
 
 
@@ -158,17 +158,17 @@ const getCate = async () => {
   // const res = await getTypes();
   // categoryOptions.value = [...res.filter((item: any) => item !== null)
   //   .map((item: any) => item.type)]
-
 }
 const handleSearch = async () => {
   // if(sendData.value.type === '') sendData.value.type = null
   if (sendData.value.searchContent === '') sendData.value.searchContent = null
   try {
-    // const res = await getDialoguePage(sendData.value)
-    // console.log(res)
-    // rawChatData.value = res.records
-    // totalAmount.value = Number(res.total)
+    const res = await getChatPage(sendData.value)
+    console.log(res)
+    rawChatData.value = res.records
+    totalAmount.value = Number(res.total)
   } catch (error) {
+    // ElMessage.error('处理数据出错')
   }
   rawChatData.value = rawChatData.value.map(item => {
     return {
@@ -199,6 +199,12 @@ const submitEdit = () => {
 }
 
 const goDelete = async (index: any, row: any) => {
+  try {
+    const res = await deleteByCid({ cid: row.cid })
+    ElMessage.success('删除成功！')
+    handleSearch()
+  } catch (error) {
+  }
 }
 
 const formatDate = (str: string) => {

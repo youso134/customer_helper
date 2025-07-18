@@ -2,16 +2,25 @@
   <div class="container">
     <!-- 顶部按钮区 -->
     <div class="inputs">
-      <span>顾客id：</span>
-      <el-input v-model="consumerId" style="width: 120px" placeholder="请输入顾客id" :disabled="isLocked"/>
-      <span style="margin-left: 40px;">用户id：</span>
-      <el-input v-model="clientId" style="width: 120px;" placeholder="请输入客服id" :disabled="isLocked"/>
+
+
+      <span>客服id：</span>
+      <el-input v-model="clientId" style="width: 120px; margin-right: 5px;" placeholder="请输入客服id"
+        :disabled="clientLocked" />
+      <el-button :disabled="clientLocked" @click="confirmLocked(2)">确定</el-button>
+
+
+      <span style="margin-left: 40px;">顾客id：</span>
+      <el-input v-model="consumerId" style="width: 120px; margin-right: 5px;" placeholder="请输入顾客id"
+        :disabled="consumerLocked" />
+      <el-button :disabled="consumerLocked" @click="confirmLocked(1)">确定</el-button>
+
     </div>
 
     <div class="button-bar">
       <el-button type="primary" @click="addDialogVisible = true">添加消息</el-button>
       <el-button type="danger" @click="deleteDialogVisible = true">删除消息</el-button>
-      <el-button type="info" >一键清空</el-button>
+      <el-button type="info" @click="clearAll">恢复默认</el-button>
       <el-button type="success" @click="submitChats">确认上传</el-button>
       <el-button type="default" @click="uploadChat">本地上传</el-button>
       <input ref="fileInput" type="file" accept=".xls,.xlsx" style="display: none" @change="handleFileChange" />
@@ -60,7 +69,7 @@
 <script lang='ts' setup>
 import { onMounted, ref } from 'vue'
 // import { Avatar, User } from '@element-plus/icons-vue'
-import { addChatByBatch } from '@/apis/chatApi'
+import { addOrUpdateChatByBatch } from '@/apis/chatApi'
 import { getDialogueDetailByDid } from '@/apis/dialogApi'
 import type { Chat } from '@/stores/types'
 import ChatDetail from '@/components/ChatDetail.vue'
@@ -81,7 +90,9 @@ const did = route.params.did as string
 let consumerId = ref()
 let clientId = ref()
 let role = ref('顾客')
-let isLocked = ref(false)
+// let isLocked = ref(false)
+let consumerLocked = ref(false)
+let clientLocked = ref(false)
 
 
 
@@ -89,28 +100,28 @@ let isLocked = ref(false)
 const rawDialogData = ref({
 })
 const rawChatData = ref<Chat[]>([
-  {
-    "cid": 0,
-    "did": 0,
-    "consumerId": 1,
-    "clientId": 2,
-    "content": "您好，有什么问题吗？",
-    "role": "客服",
-    "sensitiveReason": "质量",
-    "editTime": "2025-07-16T00:52:27.000+00:00",
-    "createTime": "2023-05-10T01:16:30.000+00:00"
-  },
-  {
-    "cid": 0,
-    "did": 0,
-    "consumerId": 1,
-    "clientId": 2,
-    "content": "没事，和你聊聊天",
-    "role": "顾客",
-    "sensitiveReason": null,
-    "editTime": "2025-07-16T00:52:27.000+00:00",
-    "createTime": "2023-05-10T01:16:30.000+00:00"
-  },
+  // {
+  //   "cid": 0,
+  //   "did": 0,
+  //   "consumerId": consumerId.value,
+  //   "clientId": clientId.value,
+  //   "content": "您好，有什么问题吗？",
+  //   "role": "客服",
+  //   "sensitiveReason": "质量",
+  //   "editTime": "2025-07-16T00:52:27.000+00:00",
+  //   "createTime": "2023-05-10T01:16:30.000+00:00"
+  // },
+  // {
+  //   "cid": 0,
+  //   "did": 0,
+  //   "consumerId": consumerId.value,
+  //   "clientId": clientId.value,
+  //   "content": "没事，和你聊聊天",
+  //   "role": "顾客",
+  //   "sensitiveReason": null,
+  //   "editTime": "2025-07-16T00:52:27.000+00:00",
+  //   "createTime": "2023-05-10T01:16:30.000+00:00"
+  // },
 ])
 // 关闭弹出窗口
 const submitAndClose = () => {
@@ -136,6 +147,26 @@ const submitAndClose = () => {
   addDialogVisible.value = false
 }
 
+// 锁定前判断是否有数据
+const confirmLocked = (num: number) => {
+  if (num === 1) {
+    if (!consumerId.value || isNaN(Number(consumerId.value))) {
+      ElMessage.info('请确认顾客id（必须是数字）');
+      return;
+    } else {
+      consumerLocked.value = true;
+    }
+  }
+  else if (num === 2) {
+    if (!clientId.value || isNaN(Number(clientId.value))) {
+      ElMessage.info('请确认客服id（必须是数字）');
+      return;
+    } else {
+      clientLocked.value = true;
+    }
+  }
+}
+
 
 // 用来保存选中的行数据
 const selectedDeleteRows = ref<Chat[]>([])
@@ -156,24 +187,39 @@ function deleteSelectedMessages() {
   deleteDialogVisible.value = false
 }
 
-// 提交修改后的chats
+// 清除数据 恢复默认
+const clearAll = () => {
+  rawChatData.value = []
+  rawDialogData.value = []
+  consumerId.value = ''
+  consumerLocked.value = false
+  clientId.value = ''
+  clientLocked.value = false
+}
+
+// 提交chats
 const submitChats = async () => {
+  if (!rawChatData.value || rawChatData.value.length === 0) {
+    ElMessage.warning('聊天记录不能为空，请先上传或添加数据')
+    return
+  }
   try {
-    const res = await addChatByBatch(rawChatData.value)
+    const res = await addOrUpdateChatByBatch(rawChatData.value)
     console.log(res)
-    ElMessage.success('修改成功！')
+    ElMessage.success('上传成功！')
   } catch (error) {
   }
 }
 
-const getChats = async (did:String) => {
+const getChats = async (did: String) => {
   try {
     const res = await getDialogueDetailByDid({ did: did })
     rawDialogData.value = res.dialogueVO
     rawChatData.value = res.chatVOList
     consumerId.value = rawChatData.value[0].consumerId
     clientId.value = rawChatData.value[0].clientId
-    isLocked.value = true
+    consumerLocked.value = true
+    clientLocked.value = true
 
   } catch (error) {
   }
@@ -228,6 +274,10 @@ const handleFileChange = async (event: Event) => {
       })
 
       rawChatData.value = mappedData
+      consumerId.value = rawChatData.value[0].consumerId
+      clientId.value = rawChatData.value[0].clientId
+      consumerLocked.value = true
+      clientLocked.value = true
       ElMessage.success('Excel 数据已成功加载！')
     }
 
@@ -240,7 +290,7 @@ const handleFileChange = async (event: Event) => {
 
 
 onMounted(() => {
-  if (did === '') {}
+  if (did === '') { }
   else {
     getChats(did)
   }
@@ -256,13 +306,14 @@ onMounted(() => {
   flex-direction: column;
   // align-items: center;
 
-  .inputs{
+  .inputs {
     display: flex;
     // gap: 20px;
     height: 30px;
     line-height: 30px;
     align-items: center;
-    .el-input{
+
+    .el-input {
       margin: 0;
       padding: 0;
     }

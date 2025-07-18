@@ -19,30 +19,35 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("@/views/Register.vue"),
   },
   {
-    path: "/main",  
+    path: "/main",
     name: "main",
-    // component: () => import("../views/Main.vue"),
+    redirect:"/main/user",
     component: () => import("@/views/Main.vue"),
+    meta: { menuIndex: "/main" },
     children: [
       {
-        path: "",
+        path: "user",
         name: "user",
         component: () => import("@/views/User.vue"),
-      },
-      {
-        path: "chatlog/:did?",
-        name: "chatlog",
-        component: () => import("@/views/ChatLog.vue"),
+        meta: { menuIndex: "/main/user" },
       },
       {
         path: "alldialoglog",
         name: "alldialoglog",
         component: () => import("@/views/AllDialogLog.vue"),
+        meta: { menuIndex: "/main/alldialoglog" },
+      },
+      {
+        path: "chatlog/:did?",
+        name: "chatlog",
+        component: () => import("@/views/ChatLog.vue"),
+        meta: { menuIndex: "/main/chatlog" },
       },
       {
         path: "allchats",
         name: "allchats",
         component: () => import("@/views/AllChats.vue"),
+        meta: { menuIndex: "/main/allchats" },
       },
     ],
   },

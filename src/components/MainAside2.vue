@@ -4,63 +4,93 @@
       <el-icon :size="30" color="#FFF">
         <Shop />
       </el-icon>
+      <!-- <h3 class="mb-2" v-show="!isCollapse">聊天信息管理系统</h3> -->
       <transition name="fade-slide">
         <h3 class="mb-2" v-if="!isCollapse">聊天信息管理系统</h3>
       </transition>
     </div>
-
-    <!-- 折叠按钮 -->
     <div class="toggle-btn" @click="isCollapse = !isCollapse">
       <el-icon>
         <component :is="isCollapse ? Expand : Fold" />
       </el-icon>
     </div>
 
-    <!-- 菜单 -->
-    <el-menu
-      active-text-color="rgb(107, 178, 248)"
-      text-color="#fff"
-      :collapse="isCollapse"
-      :default-active="currentAside as string"
-      router
-    >
-      <el-menu-item index="/main/user">
-        <el-icon><House /></el-icon>
+    <el-menu active-text-color="rgb(107, 178, 248)" :collapse="isCollapse" :default-active="currentAside as string"
+      text-color="#fff" @open="handleOpen" @close="handleClose">
+
+      <el-menu-item index="1" @click="handleMenu('/main', '1')">
+        <el-icon>
+          <House />
+        </el-icon>
         <span>个人信息</span>
       </el-menu-item>
-      <el-menu-item index="/main/alldialoglog">
-        <el-icon><Document /></el-icon>
+      <el-menu-item index="2" @click="handleMenu('/main/alldialoglog', '2')">
+        <el-icon>
+          <Document />
+        </el-icon>
         <span>查看全部聊天记录</span>
       </el-menu-item>
-      <el-menu-item index="/main/chatlog">
-        <el-icon><UploadFilled /></el-icon>
+      <el-menu-item index="3" @click="handleMenu('/main/chatlog', '3')">
+        <el-icon>
+          <UploadFilled />
+        </el-icon>
         <span>上传聊天记录</span>
       </el-menu-item>
-      <el-menu-item index="/main/allchats">
-        <el-icon><Tickets /></el-icon>
+      <el-menu-item index="4" @click="handleMenu('/main/allchats', '4')">
+        <el-icon>
+          <Tickets />
+        </el-icon>
         <span>所有消息管理</span>
       </el-menu-item>
     </el-menu>
   </el-aside>
 </template>
 
-<script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { Fold, Expand} from '@element-plus/icons-vue'
+<script lang='ts' setup name=''>
+import { onMounted, ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { Fold, Expand, House } from '@element-plus/icons-vue'
 
+const router = useRouter()
 const route = useRoute()
+// let currentAside = ref('')
+let currentAside = ref()
+
 const isCollapse = ref(false)
 
-const currentAside = computed(() => {
-  return route.meta.menuIndex || route.path
-})
+const handleMenu = (item: string, curr: string) => {
+  // currentAside = curr
+  localStorage.setItem('activeMenuIndex', curr)
+  router.push(item)
+}
 
-onMounted(()=>{
-  currentAside.value
+const handleOpen = (key: string, keyPath: string[]) => {
+  // console.log(key, keyPath)
+}
+const handleClose = (key: string, keyPath: string[]) => {
+  // console.log(key, keyPath)
+}
+
+const checkMenu = () => {
+  const savedIndex = localStorage.getItem('activeMenuIndex')
+  console.log('saveindex:', savedIndex)
+  if (savedIndex) {
+    currentAside.value = savedIndex
+  } else {
+    // 根据路径自动匹配一次
+    const path = router.currentRoute.value.path
+    if (path.includes('/main/alldialoglog')) currentAside.value = '2'
+    else if (path.includes('/main/chatlog')) currentAside.value = '3'
+    else currentAside.value = '1'
+  }
+}
+
+onMounted(() => {
+  // currentAside = computed(() => route.meta.menuIndex ?? '1')
+
+  checkMenu()
 })
 </script>
-
 
 
 <style scoped lang="scss">
