@@ -27,7 +27,7 @@
         <el-table-column prop="did" label="聊天记录did" width="120" />
         <el-table-column prop="clientId" label="客服id" width="80" />
         <el-table-column prop="consumerId" label="顾客id" width="80" />
-        <el-table-column prop="resume" label="简要概括" />
+        <el-table-column prop="resume" label="简要概括"  width="240" />
         <el-table-column prop="sensitiveReason" label="敏感词" width="80" />
 
         <el-table-column prop="createTimeFmt" label="创建时间" width="160" />
@@ -41,7 +41,7 @@
             <el-button type="primary" size="small" @click="goEdit(scope.$index, scope.row)">
               编辑
             </el-button>
-            <el-button type="danger" size="small" @click="goDelete(scope.$index, scope.row)">
+            <el-button type="danger" size="small" @click="confirmDelete(scope.$index, scope.row)">
               删除
             </el-button>
           </template>
@@ -72,6 +72,9 @@ import { ref, onMounted } from 'vue'
 import { getDialoguePage, getDialogueDetailByDid, deleteByDid, getTypes } from '@/apis/dialogApi'
 import type { DialogueItem } from '@/stores/types'
 import { useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
+import 'element-plus/theme-chalk/el-overlay.css';
+import 'element-plus/theme-chalk/el-message-box.css';
 // import { useDialogStore } from '@/stores/index'
 
 
@@ -192,14 +195,40 @@ const goEdit = (index: any, row: any) => {
     }
   })
 }
-const goDelete = async (index: any, row: any) => {
-  try {
-    const res = await deleteByDid({ did: row.did })
-    ElMessage.success('删除成功！')
-    handleSearch()
-  } catch (error) {
-  }
+// const confirmDelete = async (index: any, row: any) => {
+//   // try {
+//   //   const res = await deleteByDid({ did: row.did })
+//   //   ElMessage.success('删除成功！')
+//   //   handleSearch()
+//   // } catch (error) {
+//   //   ElMessage.info('已取消删除')
+//   // }
+// }
+
+const confirmDelete = (index: any, row: any) => {
+  ElMessageBox.confirm(
+    '确认删除这条记录吗？操作不可撤销。',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      try {
+        const res = await deleteByDid({ did: row.did })
+        ElMessage.success('删除成功')
+        handleSearch() // 重新刷新列表
+      } catch (error) {
+        ElMessage.error('删除失败')
+      }
+    })
+    .catch(() => {
+      ElMessage.info('已取消删除')
+    })
 }
+
 
 const formatDate = (str: string) => {
   if (!str) return ''
