@@ -1,4 +1,5 @@
 <template>
+
   <div class="app-container">
     <el-card class="profile-card">
       <h1 class="page-title">个人信息中心</h1>
@@ -8,16 +9,12 @@
         <div class="avatar-wrapper" @click="triggerFileInput">
           <el-avatar :size="100" :src="userInfo.avatar" class="avatar-img" />
           <div class="avatar-overlay">
-            <el-icon :size="24"><Camera /></el-icon>
+            <el-icon :size="24">
+              <Camera />
+            </el-icon>
             <span>更换头像</span>
           </div>
-          <input
-            type="file"
-            ref="fileInput"
-            accept="image/*"
-            @change="handleAvatarChange"
-            class="file-input"
-          />
+          <input type="file" ref="fileInput" accept="image/*" @change="handleAvatarChange" class="file-input" />
         </div>
         <div class="basic-info">
           <!-- UID 保留显示 -->
@@ -55,14 +52,8 @@
           <strong>出生年月：</strong>
           <template v-if="!editMode">{{ userInfo.birthdate }}</template>
           <template v-else>
-            <el-date-picker
-              v-model="userInfo.birthdate"
-              type="date"
-              value-format="YYYY-MM-DD"
-              placeholder="请选择日期"
-              size="small"
-              style="width: 180px"
-            />
+            <el-date-picker v-model="userInfo.birthdate" type="date" value-format="YYYY-MM-DD" placeholder="请选择日期"
+              size="small" style="width: 180px" />
           </template>
         </p>
 
@@ -89,14 +80,8 @@
           <strong>个性签名：</strong>
           <template v-if="!editMode">{{ userInfo.signature }}</template>
           <template v-else>
-            <el-input
-              v-model="userInfo.signature"
-              type="textarea"
-              :rows="2"
-              maxlength="100"
-              show-word-limit
-              style="width: 100%"
-            />
+            <el-input v-model="userInfo.signature" type="textarea" :rows="2" maxlength="100" show-word-limit
+              style="width: 100%" />
           </template>
         </p>
       </div>
@@ -116,47 +101,20 @@
 
     <!-- 修改密码弹窗 -->
     <!-- 修改密码弹窗 -->
-    <el-dialog
-      v-model="showPasswordDialog"
-      title="🔒 修改密码"
-      width="450px"
-      class="password-dialog"
-      :close-on-click-modal="false"
-      @close="resetPasswordDialog"
-    >
-      <el-form
-        :model="passwordForm"
-        :rules="passwordRules"
-        ref="passwordFormRef"
-        label-position="top"
-        class="password-form"
-      >
+    <el-dialog v-model="showPasswordDialog" title="🔒 修改密码" width="450px" class="password-dialog"
+      :close-on-click-modal="false" @close="resetPasswordDialog">
+      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-position="top"
+        class="password-form">
         <el-form-item label="原密码" prop="userPassword">
-          <el-input
-            v-model="passwordForm.userPassword"
-            type="password"
-            placeholder="请输入原密码"
-            size="medium"
-            clearable
-          />
+          <el-input v-model="passwordForm.userPassword" type="password" placeholder="请输入原密码" size="medium" clearable />
         </el-form-item>
         <el-form-item label="新密码" prop="userNewPassword">
-          <el-input
-            v-model="passwordForm.userNewPassword"
-            type="password"
-            placeholder="请输入新密码"
-            size="medium"
-            clearable
-          />
+          <el-input v-model="passwordForm.userNewPassword" type="password" placeholder="请输入新密码" size="medium"
+            clearable />
         </el-form-item>
         <el-form-item label="确认新密码" prop="confirmPassword">
-          <el-input
-            v-model="passwordForm.confirmPassword"
-            type="password"
-            placeholder="再次输入新密码"
-            size="medium"
-            clearable
-          />
+          <el-input v-model="passwordForm.confirmPassword" type="password" placeholder="再次输入新密码" size="medium"
+            clearable />
         </el-form-item>
       </el-form>
 
@@ -169,6 +127,7 @@
     </el-dialog>
 
   </div>
+
 </template>
 
 <script setup>
@@ -230,9 +189,9 @@ const saveProfile = async () => {
   })
   try {
     const payload = {
-    ...userInfo,
-    // userAccount: 'Cj1234',
-    // userAccount: localStorage.getItem('userAccount')
+      ...userInfo,
+      // userAccount: 'Cj1234',
+      // userAccount: localStorage.getItem('userAccount')
     }
     const res = await updateUser(payload)
     if (res && res.uid) { // 判断是否返回了有效用户数据
@@ -276,13 +235,13 @@ const passwordForm = reactive({
 
 const passwordRules = {
   userPassword: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
-  userNewPassword:[
+  userNewPassword: [
     { required: true, message: '密码不能为空', trigger: 'blur' },
-    { 
+    {
       validator: (rule, value, callback) => {
         if (value === passwordForm.userPassword) {
-        callback(new Error('新密码不能与原密码相同'))
-      }else if (!/[A-Z]/.test(value)) {
+          callback(new Error('新密码不能与原密码相同'))
+        } else if (!/[A-Z]/.test(value)) {
           callback(new Error('密码必须包含至少一个大写字母'))
         } else if (!/[a-z]/.test(value)) {
           callback(new Error('密码必须包含至少一个小写字母'))
@@ -294,7 +253,7 @@ const passwordRules = {
           callback()
         }
       },
-    trigger: 'blur'
+      trigger: 'blur'
     },
     { min: 6, max: 20, message: '密码长度应为6-20位', trigger: 'blur' }
   ],
@@ -406,19 +365,17 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .app-container {
-  // height: 100%;
-  // height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  // min-height: 100vh;
+  min-height: 100%;
   padding: 40px;
 
   /* 背景图 + 混合渐变层 */
-  background: 
+  background:
     linear-gradient(rgba(255, 255, 255, 0.85), rgba(240, 248, 255, 0.9)),
-    url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1950&q=80')
-      no-repeat center center;
+    url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1950&q=80') no-repeat center center;
   background-size: cover;
   background-attachment: fixed;
 }
@@ -430,9 +387,11 @@ onMounted(() => {
   max-width: 800px;
   padding: 30px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0); /* 半透明 */
+  background: rgba(255, 255, 255, 0);
+  /* 半透明 */
   box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
-  backdrop-filter: blur(10px); /* 关键模糊效果 */
+  backdrop-filter: blur(10px);
+  /* 关键模糊效果 */
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
 
@@ -486,14 +445,18 @@ onMounted(() => {
   cursor: pointer;
   transition: all 0.3s ease;
   margin-right: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* 增加柔和的阴影 */
-  
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  /* 增加柔和的阴影 */
+
   &:hover {
-    transform: scale(1.1); /* 放大效果 */
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* 悬停时的阴影效果 */
-    
+    transform: scale(1.1);
+    /* 放大效果 */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    /* 悬停时的阴影效果 */
+
     .avatar-overlay {
-      opacity: 1; /* 显示头像覆盖层 */
+      opacity: 1;
+      /* 显示头像覆盖层 */
     }
   }
 }
@@ -504,6 +467,7 @@ onMounted(() => {
   height: 100%;
   object-fit: cover;
 }
+
 .column-layout {
   display: flex;
   flex-direction: column;
@@ -520,6 +484,7 @@ onMounted(() => {
     color: #2c3e50;
     margin-bottom: 5px;
   }
+
   .role {
     font-size: 16px;
     color: #7f8c8d;
@@ -559,7 +524,7 @@ onMounted(() => {
   color: white;
   opacity: 0;
   transition: opacity 0.3s ease;
-  
+
   span {
     font-size: 14px;
     margin-top: 5px;
@@ -575,7 +540,7 @@ onMounted(() => {
     color: #2c3e50;
     margin-bottom: 10px;
   }
-  
+
   .user-role {
     font-size: 14px;
     color: #7f8c8d;
@@ -587,14 +552,15 @@ onMounted(() => {
   .form-row {
     display: flex;
     gap: 20px;
-    
+
     .el-form-item {
       flex: 1;
     }
   }
-  
+
   .el-form-item {
-    margin-bottom: 24px; /* 增加表单项间距 */
+    margin-bottom: 24px;
+    /* 增加表单项间距 */
   }
 }
 
@@ -611,19 +577,23 @@ onMounted(() => {
   border-radius: 8px;
   padding: 10px 20px;
   transition: all 0.3s ease;
-  
+
   &:hover {
-    transform: translateY(-3px); /* 悬停时按钮上移 */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 按钮的阴影效果 */
+    transform: translateY(-3px);
+    /* 悬停时按钮上移 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* 按钮的阴影效果 */
   }
-  
+
   &.el-button--primary {
-    background-color: #3498db; /* 按钮纯色背景 */
+    background-color: #3498db;
+    /* 按钮纯色背景 */
     border: none;
     color: white;
-    
+
     &:hover {
-      background-color: #2980b9; /* 按钮悬停时颜色变深 */
+      background-color: #2980b9;
+      /* 按钮悬停时颜色变深 */
     }
   }
 }
@@ -633,27 +603,28 @@ onMounted(() => {
   .profile-card {
     padding: 20px;
   }
-  
+
   .avatar-section {
     flex-direction: column;
     text-align: center;
-    
+
     .avatar-wrapper {
       margin-right: 0;
       margin-bottom: 15px;
     }
   }
-  
+
   .form-row {
     flex-direction: column;
     gap: 0 !important;
   }
-  
+
   .el-form-item {
     margin-bottom: 15px;
   }
-  
+
 }
+
 .password-dialog {
   .el-dialog__header {
     text-align: center;
@@ -680,5 +651,4 @@ onMounted(() => {
     padding: 10px 20px 0;
   }
 }
-
 </style>
