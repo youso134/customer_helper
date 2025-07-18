@@ -40,7 +40,17 @@ export function getTypes() {
     headers: {
       "Content-Type": "application/json", 
     },
-    // data: JSON.stringify()
+  });
+}
+
+export function addDialogueByBatch(data:any) {
+  return request({
+    url: "/dialogue/addDialogueByBatch",
+    method: "post",
+    headers: {
+      "Content-Type": "application/json", 
+    },
+    data: JSON.stringify(data)
   });
 }
 

@@ -67,6 +67,18 @@ export function deleteByCid(data:any) {
   });
 }
 
+export function updateByCid(data:any) {
+  return request({
+    url: "/chat/updateByCid",
+    method: "post",
+    headers: {
+      "Content-Type": "application/json", 
+    },
+    data: JSON.stringify(data)
+  });
+}
+
+
 
 
 

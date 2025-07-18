@@ -18,12 +18,10 @@
     </div>
 
     <div class="button-bar">
-      <el-button type="primary" @click="addDialogVisible = true">添加消息</el-button>
-      <el-button type="danger" @click="deleteDialogVisible = true">删除消息</el-button>
+      <el-button type="primary" @click="addChat">添加消息</el-button>
+      <!-- <el-button type="danger" @click="deleteDialogVisible = true">删除消息</el-button> -->
       <el-button type="info" @click="clearAll">恢复默认</el-button>
       <el-button type="success" @click="submitChats">确认上传</el-button>
-      <el-button type="default" @click="uploadChat">本地上传</el-button>
-      <input ref="fileInput" type="file" accept=".xls,.xlsx" style="display: none" @change="handleFileChange" />
       <el-checkbox v-model="checked2">上传后自动解析</el-checkbox>
 
     </div>
@@ -31,8 +29,7 @@
     <!-- 主内容区 -->
     <div class="main-content">
       <!-- <ChatDetail :chatList="chatList" :highLight="highLight" :currentMsg="currentMsg" /> -->
-      <ChatDetail :rawDialogData="rawDialogData" :rawChatData="rawChatData" />
-
+      <ChatDetail  :rawDialogData="rawDialogData" :rawChatData="rawChatData" />
     </div>
 
     <!-- 添加的窗口 -->
@@ -66,7 +63,7 @@
 </template>
 
 
-<script lang='ts' setup>
+<script lang='ts' setup name="AddorEditChat">
 import { onMounted, ref } from 'vue'
 // import { Avatar, User } from '@element-plus/icons-vue'
 import { addOrUpdateChatByBatch } from '@/apis/chatApi'
@@ -74,14 +71,12 @@ import { getDialogueDetailByDid } from '@/apis/dialogApi'
 import type { Chat } from '@/stores/types'
 import ChatDetail from '@/components/ChatDetail.vue'
 // import { useDialogStore } from '@/stores/index'
-import * as XLSX from 'xlsx'
 import { useRoute } from 'vue-router'
 
 
 const inputmsg = ref<string>('')
 const addDialogVisible = ref(false)
 const deleteDialogVisible = ref(false)
-const fileInput = ref<HTMLInputElement | null>(null)
 const checked2 = ref()
 const roleList = ['顾客', '客服']
 const route = useRoute()
@@ -90,13 +85,11 @@ const did = route.params.did as string
 let consumerId = ref()
 let clientId = ref()
 let role = ref('顾客')
-// let isLocked = ref(false)
 let consumerLocked = ref(false)
 let clientLocked = ref(false)
 
 
 
-// const currentDg = useDialogStore()
 const rawDialogData = ref({
 })
 const rawChatData = ref<Chat[]>([
@@ -187,6 +180,11 @@ function deleteSelectedMessages() {
   deleteDialogVisible.value = false
 }
 
+const addChat = () =>{
+  if(clientLocked.value  && consumerId.value) addDialogVisible.value = true
+  else ElMessage.info('请锁定客服id和顾客id')
+  
+}
 // 清除数据 恢复默认
 const clearAll = () => {
   rawChatData.value = []
@@ -206,6 +204,7 @@ const submitChats = async () => {
   try {
     const res = await addOrUpdateChatByBatch(rawChatData.value)
     console.log(res)
+    rawDialogData.value = res
     ElMessage.success('上传成功！')
   } catch (error) {
   }
@@ -224,70 +223,6 @@ const getChats = async (did: String) => {
   } catch (error) {
   }
 }
-
-const getChatMessage = async () => {
-}
-
-const uploadChat = () => {
-  fileInput.value?.click()
-}
-const handleFileChange = async (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files ? target.files[0] : null
-  if (!file) return
-
-  try {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const data = e.target?.result
-      const workbook = XLSX.read(data, { type: 'binary' })
-      const sheetName = workbook.SheetNames[0]
-      const worksheet = workbook.Sheets[sheetName]
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: '' }) // defval 空值填 ''
-
-      // 目标字段
-      const requiredFields = [
-        'cid',
-        'did',
-        'consumerId',
-        'clientId',
-        'content',
-        'role',
-        'sensitiveReason',
-        'editTime',
-        'createTime'
-      ]
-
-      // 映射 Excel 数据到 rawChatData
-      const mappedData = (jsonData as any[]).map(row => {
-        return {
-          cid: row['cid'] || 0,
-          did: row['did'] || 0,
-          consumerId: row['consumerId'] || '',
-          clientId: row['clientid'] || row['clientId'] || '',
-          content: row['content'] || '',
-          role: row['role'] || '',
-          sensitiveReason: null,
-          editTime: new Date().toISOString(),
-          createTime: new Date().toISOString()
-        }
-      })
-
-      rawChatData.value = mappedData
-      consumerId.value = rawChatData.value[0].consumerId
-      clientId.value = rawChatData.value[0].clientId
-      consumerLocked.value = true
-      clientLocked.value = true
-      ElMessage.success('Excel 数据已成功加载！')
-    }
-
-    reader.readAsBinaryString(file)
-  } catch (error) {
-    console.error('文件读取错误', error)
-    ElMessage.error('文件读取失败，请检查文件格式')
-  }
-}
-
 
 onMounted(() => {
   if (did === '') { }
