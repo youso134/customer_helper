@@ -36,13 +36,24 @@ export function addOrUpdateChatByBatch(data:any) {
   });
 }
 
-export function getAllChat() {
+// export function getAllChat() {
+//   return request({
+//     url: "/chat/getAllChat",
+//     method: "get",
+//     // headers: {
+//     //   "Content-Type": "application/json", 
+//     // },
+//   });
+// }
+export function getChatPage(data:any) {
   return request({
-    url: "/chat/getAllChat",
-    method: "get",
-    // headers: {
-    //   "Content-Type": "application/json", 
-    // },
+    url: "/chat/getChatPage",
+    method: "post",
+    headers: {
+      "Content-Type": "application/json", 
+    },
+    data: JSON.stringify(data)
+
   });
 }
 export function deleteByCid(data:any) {

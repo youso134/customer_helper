@@ -73,10 +73,6 @@ import { useRouter } from 'vue-router'
 // import { useDialogStore } from '@/stores/index'
 
 
-interface ChatItem {
-  type: 'C' | 'U'  // 明确指定只能是这两种值
-  content: string
-}
 const router = useRouter()
 
 const sendData = ref({ pageSize: 20, currentPage: 1, type: '', searchContent: null })
@@ -85,8 +81,6 @@ let contentData = ref<DialogueItem[]>([])
 let categoryOptions = ref<string[]>([])
 const dialogVisible = ref(false)
 
-const chatList = ref<ChatItem[]>([])
-const highLight = ref<string[]>([])
 const totalAmount = ref(0)
 // const currentDg = useDialogStore()
 
@@ -188,7 +182,7 @@ const goDetail = async (index: any, row: any) => {
 
 }
 const goEdit = (index: any, row: any) => {
-  localStorage.setItem('activeMenuIndex', '3')
+  // localStorage.setItem('activeMenuIndex', '3')
   // currentDg.setCurrentDialog(row)
   router.push({
     name: 'chatlog', params: {

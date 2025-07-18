@@ -83,7 +83,7 @@
 
 <script lang="ts" setup name="AllChats">
 import { ref, onMounted } from 'vue'
-import { getAllChat, deleteByCid } from '@/apis/chatApi'
+import { getChatPage, deleteByCid } from '@/apis/chatApi'
 import type { DialogueItem } from '@/stores/types'
 
 
@@ -163,14 +163,14 @@ const handleSearch = async () => {
   // if(sendData.value.type === '') sendData.value.type = null
   if (sendData.value.searchContent === '') sendData.value.searchContent = null
   try {
-    const res = await getAllChat()
-    rawChatData.value = res
-    totalAmount.value = Number(res.length)
+    const res = await getChatPage(sendData.value)
+    console.log(res)
+    rawChatData.value = res.records
+    totalAmount.value = Number(res.total)
   } catch (error) {
     // ElMessage.error('处理数据出错')
   }
   rawChatData.value = rawChatData.value.map(item => {
-    console.log(item)
     return {
       ...item,
       createTimeFmt: formatDate(item.createTime || ''),

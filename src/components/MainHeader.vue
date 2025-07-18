@@ -40,13 +40,13 @@ const userStore = useUserStore()
 
 
 const handleUser = () => {
-  localStorage.setItem('activeMenuIndex', '1')
+  // localStorage.setItem('activeMenuIndex', '1')
   router.push({ name: 'user' })
 }
 
 const handleLogout = () => {
   localStorage.removeItem('user')
-  localStorage.removeItem('activeMenuIndex')
+  // localStorage.removeItem('activeMenuIndex')
   userStore.clearUser()
   router.push('/')
 }

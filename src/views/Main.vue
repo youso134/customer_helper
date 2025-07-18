@@ -21,20 +21,19 @@
 </template>
 
 <script lang='ts' setup name='Main'>
-import { onMounted } from 'vue'
+import { onMounted} from 'vue'
 import MainAside from '../components/MainAside.vue';
 import MainHeader from '../components/MainHeader.vue';
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router';
 
-const router = useRouter()
 
 onMounted(() => {
-  const savedIndex = localStorage.getItem('activeMenuIndex')
-  if(savedIndex === '2'){
-    router.push({ name: 'alldialoglog' })
-  }else if(savedIndex === '3') {
-    router.push({ name: 'chatlog' })
-  }
+  // const savedIndex = localStorage.getItem('activeMenuIndex')
+  // if (savedIndex === '2') {
+  //   router.push({ name: 'alldialoglog' })
+  // } else if (savedIndex === '3') {
+  //   router.push({ name: 'chatlog' })
+  // }
 
   // let res = localStorage.getItem('user')
   // if (res === null) {
@@ -49,8 +48,9 @@ onMounted(() => {
 .main-layout {
   height: 100vh;
   background-color: #EFF0F2;
-   overflow: auto;
-  .el-container{
+  overflow: auto;
+
+  .el-container {
     height: 100%;
   }
 
@@ -58,6 +58,7 @@ onMounted(() => {
   .el-main {
     padding: 0;
   }
+
   // .el-main{
   //   height: 80%;
   // }

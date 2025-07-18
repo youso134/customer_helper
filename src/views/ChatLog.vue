@@ -2,14 +2,19 @@
   <div class="container">
     <!-- 顶部按钮区 -->
     <div class="inputs">
-      <span>顾客id：</span>
-      <el-input v-model="consumerId" style="width: 120px; margin-right: 5px;" placeholder="请输入顾客id"
-        :disabled="consumerLocked" />
-      <el-button :disabled="consumerLocked" @click="confirmLocked(1)">确定</el-button>
-      <span style="margin-left: 40px;">用户id：</span>
+
+
+      <span>客服id：</span>
       <el-input v-model="clientId" style="width: 120px; margin-right: 5px;" placeholder="请输入客服id"
         :disabled="clientLocked" />
       <el-button :disabled="clientLocked" @click="confirmLocked(2)">确定</el-button>
+
+
+      <span style="margin-left: 40px;">顾客id：</span>
+      <el-input v-model="consumerId" style="width: 120px; margin-right: 5px;" placeholder="请输入顾客id"
+        :disabled="consumerLocked" />
+      <el-button :disabled="consumerLocked" @click="confirmLocked(1)">确定</el-button>
+
     </div>
 
     <div class="button-bar">
@@ -192,7 +197,7 @@ const clearAll = () => {
   clientLocked.value = false
 }
 
-// 提交修改后的chats
+// 提交chats
 const submitChats = async () => {
   if (!rawChatData.value || rawChatData.value.length === 0) {
     ElMessage.warning('聊天记录不能为空，请先上传或添加数据')
@@ -201,7 +206,7 @@ const submitChats = async () => {
   try {
     const res = await addOrUpdateChatByBatch(rawChatData.value)
     console.log(res)
-    ElMessage.success('修改成功！')
+    ElMessage.success('上传成功！')
   } catch (error) {
   }
 }
