@@ -1,18 +1,20 @@
 <template>
   <div class="header">
     <div class="l-content">
-      <el-button size="small">
-        <component class="icons" is='menu'></component>
+      <el-button size="small" class="menu-btn">
+        <component class="icons" is="menu"></component>
       </el-button>
       <el-breadcrumb separator="/" class="bread">
         <el-breadcrumb-item :to="{ path: '/main' }">主页</el-breadcrumb-item>
-        <!-- <el-breadcrumb-item v-if="current" :to="current.path">{{current.label}}</el-breadcrumb-item> -->
       </el-breadcrumb>
     </div>
     <div class="r-content">
       <el-dropdown>
         <span class="el-dropdown-link">
-          <img src="https://api.dicebear.com/9.x/adventurer/svg?seed=Mackenzie" class="user" />
+          <img
+            src="https://api.dicebear.com/9.x/adventurer/svg?seed=Mackenzie"
+            class="user-avatar"
+          />
           <span class="username">{{ userStore.user.userName }}</span>
           <el-icon class="el-icon--right">
             <arrow-down />
@@ -29,19 +31,17 @@
   </div>
 </template>
 
-<script setup name='MainHeader' lang="ts">
-import { useRouter } from 'vue-router';
-import { useUserStore } from '../stores';
-import { onMounted } from 'vue';
-
+<script setup lang="ts" name="MainHeader">
+import { useRouter } from 'vue-router'
+import { useUserStore } from '../stores'
+import { onMounted } from 'vue'
 
 const router = useRouter()
 const userStore = useUserStore()
 
-
 const handleUser = () => {
-  // localStorage.setItem('activeMenuIndex', '1')
-  router.push({ name: 'user' })
+  localStorage.setItem('activeMenuIndex', '1')
+  router.push({ path: '/main' })
 }
 
 const handleLogout = () => {
@@ -51,16 +51,12 @@ const handleLogout = () => {
   router.push('/')
 }
 
-
 onMounted(() => {
-  let res: any = localStorage.getItem('user')
+  const res = localStorage.getItem('user')
   if (res !== null) {
-    res = JSON.parse(res)
-    userStore.setUser(res)
-  }
-  else{
-    // ElMessage.error('未读取到浏览器缓存User')
-    console.log('mianheader没读取到user')
+    userStore.setUser(JSON.parse(res))
+  } else {
+    console.log('MainHeader 未读取到 user')
   }
 })
 </script>
@@ -70,63 +66,77 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
   height: 60px;
-  background-color: #2893E5;
-  // background-color: #2B3037;
+  padding: 0 24px;
+  box-sizing: border-box;
+
+  background: linear-gradient(90deg, #479db0, #8cb7e3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
   .l-content {
     display: flex;
     align-items: center;
-    padding-left: 20px;
 
-    .el-button {
+    .menu-btn {
       margin-right: 20px;
+      background-color: #33889b;
+      border: none;
+      color: #fff;
+      border-radius: 6px;
+      transition: background 0.3s;
+
+      &:hover {
+        background-color: #1e5a68;
+      }
     }
 
     .icons {
-      height: 20px;
       width: 20px;
+      height: 20px;
+    }
+
+    .bread {
+      font-size: 16px;
+      color: #cfd8dc;
+
+      ::v-deep(.el-breadcrumb__inner) {
+        color: #cfd8dc !important;
+      }
     }
   }
 
   .r-content {
-
-    // flex-direction: row;
+    display: flex;
+    align-items: center;
+    height: 100%;
 
     .el-dropdown-link {
       display: flex;
       align-items: center;
+      cursor: pointer;
 
-      &:hover,
-      &:focus {
-        outline: none;
-        box-shadow: none;
+      .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid #1b5e6d;
+        margin-right: 10px;
+        object-fit: cover;
       }
 
       .username {
-        font-size: 16px;
-        color: #FFF;
-        margin: 10px;
+        font-size: 14px;
+        color: #032f39;
+        margin-right: 6px;
+        font-weight: 500;
       }
 
       .el-icon--right {
-        color: #FFF;
-      }
-
-      .user {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
+        color: #032f39;
+        font-size: 14px;
       }
     }
-
   }
-}
-
-
-:deep(.bread span) {
-  color: #fff !important;
-  cursor: pointer !important;
 }
 </style>

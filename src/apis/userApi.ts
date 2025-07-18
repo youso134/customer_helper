@@ -46,7 +46,7 @@ export function updateUser(data: updated){
   });
 }
 
-export function getuser(userAccount:any) {
+export function getUser(userAccount:any) {
   return request({
     url: "/user/getLoginUserByAccount",
     method: "post",

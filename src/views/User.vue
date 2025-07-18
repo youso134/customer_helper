@@ -115,24 +115,59 @@
     </el-card>
 
     <!-- 修改密码弹窗 -->
-    <el-dialog v-model="showPasswordDialog" title="修改密码" width="400px" :close-on-click-modal="false">
-      <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-position="top">
-        <el-form-item label="原密码" prop="oldPassword">
-          <el-input v-model="passwordForm.oldPassword" type="password" />
+    <!-- 修改密码弹窗 -->
+    <el-dialog
+      v-model="showPasswordDialog"
+      title="🔒 修改密码"
+      width="450px"
+      class="password-dialog"
+      :close-on-click-modal="false"
+      @close="resetPasswordDialog"
+    >
+      <el-form
+        :model="passwordForm"
+        :rules="passwordRules"
+        ref="passwordFormRef"
+        label-position="top"
+        class="password-form"
+      >
+        <el-form-item label="原密码" prop="userPassword">
+          <el-input
+            v-model="passwordForm.userPassword"
+            type="password"
+            placeholder="请输入原密码"
+            size="medium"
+            clearable
+          />
         </el-form-item>
-        <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="passwordForm.newPassword" type="password" />
+        <el-form-item label="新密码" prop="userNewPassword">
+          <el-input
+            v-model="passwordForm.userNewPassword"
+            type="password"
+            placeholder="请输入新密码"
+            size="medium"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="确认新密码" prop="confirmPassword">
-          <el-input v-model="passwordForm.confirmPassword" type="password" />
+          <el-input
+            v-model="passwordForm.confirmPassword"
+            type="password"
+            placeholder="再次输入新密码"
+            size="medium"
+            clearable
+          />
         </el-form-item>
       </el-form>
 
       <template #footer>
-        <el-button @click="showPasswordDialog = false">取消</el-button>
-        <el-button type="primary" @click="submitPasswordChange">确认修改</el-button>
+        <div class="password-dialog-footer">
+          <el-button @click="showPasswordDialog = false">取消</el-button>
+          <el-button type="primary" @click="submitPasswordChange">确认修改</el-button>
+        </div>
       </template>
     </el-dialog>
+
   </div>
 </template>
 
@@ -140,13 +175,14 @@
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElLoading } from 'element-plus'
 import { Camera, Edit, Check, Close, Lock } from '@element-plus/icons-vue'
-import { getuser, updateUser } from '@/apis/userApi'
+import { getUser, updateUser } from '@/apis/userApi'
+import { useUserStore } from '../stores/index.ts'
 
 const editMode = ref(false)
 const fileInput = ref(null)
 const originalInfo = ref({})
 const tempInfo = ref({})
-
+const userStore = useUserStore()
 const userInfo = reactive({
   userName: '',
   userRole: '',
@@ -154,10 +190,17 @@ const userInfo = reactive({
   avatar: 'https://api.dicebear.com/9.x/adventurer/svg?seed=Mackenzie',
   gender: '',
   birthdate: '',
-  phone: '18055566612',
-  email: '123@qq.com',
+  phone: '',
+  email: '',
   signature: ''
 })
+
+const resetPasswordDialog = () => {
+  passwordForm.userPassword = ''
+  passwordForm.userNewPassword = ''
+  passwordForm.confirmPassword = ''
+  passwordFormRef.value?.resetFields()
+}
 
 const validateBeforeSave = () => {
   const phoneReg = /^1[3-9]\d{9}$/
@@ -195,6 +238,8 @@ const saveProfile = async () => {
     if (res && res.uid) { // 判断是否返回了有效用户数据
       originalInfo.value = JSON.parse(JSON.stringify(userInfo))
       editMode.value = false
+      userStore.setUser(res)
+      localStorage.setItem('user', JSON.stringify(res))
       ElMessage.success('个人信息已保存')
     } else {
       ElMessage.error('保存失败')
@@ -224,22 +269,40 @@ const handleAvatarChange = (e) => {
 const showPasswordDialog = ref(false)
 const passwordFormRef = ref(null)
 const passwordForm = reactive({
-  oldPassword: '',
-  newPassword: '',
+  userPassword: '',
+  userNewPassword: '',
   confirmPassword: ''
 })
 
 const passwordRules = {
-  oldPassword: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
-  newPassword: [
-    { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, message: '密码至少6位', trigger: 'blur' }
+  userPassword: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
+  userNewPassword:[
+    { required: true, message: '密码不能为空', trigger: 'blur' },
+    { 
+      validator: (rule, value, callback) => {
+        if (value === passwordForm.userPassword) {
+        callback(new Error('新密码不能与原密码相同'))
+      }else if (!/[A-Z]/.test(value)) {
+          callback(new Error('密码必须包含至少一个大写字母'))
+        } else if (!/[a-z]/.test(value)) {
+          callback(new Error('密码必须包含至少一个小写字母'))
+        } else if (!/[0-9]/.test(value)) {
+          callback(new Error('密码必须包含至少一个数字'))
+        } else if (/[\u4e00-\u9fa5]/.test(value)) {
+          callback(new Error('密码不能包含中文'))
+        } else {
+          callback()
+        }
+      },
+    trigger: 'blur'
+    },
+    { min: 6, max: 20, message: '密码长度应为6-20位', trigger: 'blur' }
   ],
   confirmPassword: [
     { required: true, message: '请确认新密码', trigger: 'blur' },
     {
       validator: (rule, value, callback) => {
-        if (value !== passwordForm.newPassword) {
+        if (value !== passwordForm.userNewPassword) {
           callback(new Error('两次输入的密码不一致'))
         } else {
           callback()
@@ -251,31 +314,53 @@ const passwordRules = {
 }
 
 const openPasswordDialog = () => {
-  passwordForm.oldPassword = ''
-  passwordForm.newPassword = ''
+  passwordForm.userPassword = ''
+  passwordForm.userNewPassword = ''
   passwordForm.confirmPassword = ''
   showPasswordDialog.value = true
-}
 
+  // ✨ 清空校验状态和错误提示
+  nextTick(() => {
+    passwordFormRef.value?.resetFields()
+  })
+}
 const submitPasswordChange = async () => {
   try {
     await passwordFormRef.value.validate()
-    const loading = ElLoading.service({ lock: true, text: '修改中...', background: 'rgba(0, 0, 0, 0.7)' })
 
-    // 模拟密码验证
-    if (passwordForm.oldPassword !== '123456') {
-      throw new Error('原密码错误')
+    const loading = ElLoading.service({
+      lock: true,
+      text: '修改中...',
+      background: 'rgba(0, 0, 0, 0.7)'
+    })
+
+    const userStr = localStorage.getItem('user')
+    if (!userStr) throw new Error('用户未登录，请重新登录')
+
+    const user = JSON.parse(userStr)
+
+    const payload = {
+      uid: user.uid,
+      userPassword: passwordForm.userPassword,
+      userNewPassword: passwordForm.userNewPassword
     }
 
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    ElMessage.success('密码修改成功')
-    showPasswordDialog.value = false
+    const res = await updateUser(payload)
+
+    if (res && res.success !== false) {
+      ElMessage.success('密码修改成功')
+      showPasswordDialog.value = false
+    } else {
+      ElMessage.error(res?.message || '修改失败，请检查原密码是否正确')
+    }
+
     loading.close()
   } catch (err) {
     ElMessage.error(err.message || '修改失败')
     ElLoading.service().close()
   }
 }
+
 
 const getUserInfo = async () => {
   const userStr = localStorage.getItem('user')
@@ -296,7 +381,7 @@ const getUserInfo = async () => {
     return
   }
   try {
-    const res = await getuser(userAccount)
+    const res = await getUser(userAccount)
     console.log('后端响应结果:', res)
     // 判断方式：直接判断是否存在 uid 或 userName 等关键字段
     const data = res?.data || res
@@ -327,37 +412,59 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 20px;
-  background-color: #f4f6f9; /* 清爽的浅灰背景 */
+  padding: 40px;
+
+  /* 背景图 + 混合渐变层 */
+  background: 
+    linear-gradient(rgba(255, 255, 255, 0.85), rgba(240, 248, 255, 0.9)),
+    url('https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1950&q=80')
+      no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed;
 }
+
 
 /* 卡片样式 */
 .profile-card {
   width: 100%;
   max-width: 800px;
-  border-radius: 16px;
   padding: 30px;
-  background-color: #ffffff;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* 柔和阴影 */
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0); /* 半透明 */
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+  backdrop-filter: blur(10px); /* 关键模糊效果 */
+  border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
-    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.15); /* 悬停时的柔和阴影效果 */
-    transform: translateY(-5px); /* 卡片浮动效果 */
+    transform: translateY(-5px);
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.15);
   }
 }
 
+
 /* 标题样式 */
 .page-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #2c3e50;
+  font-size: 32px;
+  font-weight: bold;
+  color: #34495e;
   margin-bottom: 30px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #ecf0f1;
   text-align: center;
-  letter-spacing: 0.5px;
+  text-shadow: 1px 2px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: 1px;
+  position: relative;
+
+  &::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    background-color: #3498db;
+    margin: 10px auto 0;
+    border-radius: 2px;
+  }
 }
+
 
 /* 头像部分 */
 .avatar-section {
@@ -544,6 +651,33 @@ onMounted(() => {
   
   .el-form-item {
     margin-bottom: 15px;
+  }
+  
+}
+.password-dialog {
+  .el-dialog__header {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  .password-form {
+    padding: 10px 5px;
+
+    .el-form-item {
+      margin-bottom: 20px;
+
+      .el-input {
+        width: 100%;
+      }
+    }
+  }
+
+  .password-dialog-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px 0;
   }
 }
 

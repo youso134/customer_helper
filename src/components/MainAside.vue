@@ -1,141 +1,179 @@
 <template>
-  <el-aside class="container" :class="{ collapsed: isCollapse }">
+  <el-aside :class="{ collapsed: isCollapse }">
+    <!-- 顶部图标和标题 -->
     <div class="top-info">
-      <el-icon :size="30" color="#FFF">
-        <Shop />
-      </el-icon>
+      <el-icon :size="30" color="rgb(220, 214, 214)"><Shop /></el-icon>
       <transition name="fade-slide">
-        <h3 class="mb-2" v-if="!isCollapse">聊天信息管理系统</h3>
+        <h3 class="system-title" v-if="!isCollapse">聊天信息管理系统</h3>
       </transition>
     </div>
 
-    <!-- 折叠按钮 -->
+    <!-- 收缩/展开按钮 -->
     <div class="toggle-btn" @click="isCollapse = !isCollapse">
-      <el-icon>
-        <component :is="isCollapse ? Expand : Fold" />
-      </el-icon>
+      <el-icon><component :is="isCollapse ? Expand : Fold" /></el-icon>
     </div>
 
-    <!-- 菜单 -->
+    <!-- 菜单区域 -->
     <el-menu
-      active-text-color="rgb(107, 178, 248)"
-      text-color="#fff"
-      :collapse="isCollapse"
-      :default-active="currentAside as string"
-      router
+      :default-active="currentAside"
+      active-text-color="#42A5F5"
+      text-color="#cfd8dc"
+      background-color="transparent"
+      @open="handleOpen"
+      @close="handleClose"
     >
-      <el-menu-item index="/main/user">
+      <el-menu-item index="1" @click="handleMenu('/main', '1')">
         <el-icon><House /></el-icon>
-        <span>个人信息</span>
+        <transition name="fade-slide">
+          <span v-if="!isCollapse">个人信息</span>
+        </transition>
       </el-menu-item>
-      <el-menu-item index="/main/alldialoglog">
+
+      <el-menu-item index="2" @click="handleMenu('/main/allchatlog', '2')">
         <el-icon><Document /></el-icon>
-        <span>查看全部聊天记录</span>
+        <transition name="fade-slide">
+          <span v-if="!isCollapse">查看全部聊天记录</span>
+        </transition>
       </el-menu-item>
-      <el-menu-item index="/main/addoreditchat">
+
+      <el-menu-item index="3" @click="handleMenu('/main/chatlog', '3')">
         <el-icon><UploadFilled /></el-icon>
-        <span>编辑聊天记录</span>
-      </el-menu-item>
-      <el-menu-item index="/main/addchats">
-        <el-icon><UploadFilled /></el-icon>
-        <span>批量添加聊天记录</span>
-      </el-menu-item>
-      <el-menu-item index="/main/allchats">
-        <el-icon><Tickets /></el-icon>
-        <span>所有消息管理</span>
+        <transition name="fade-slide">
+          <span v-if="!isCollapse">上传聊天记录</span>
+        </transition>
       </el-menu-item>
     </el-menu>
   </el-aside>
 </template>
 
-<script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { Fold, Expand} from '@element-plus/icons-vue'
+<script setup lang="ts" name="MainAside">
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { Fold, Expand, House, Document, UploadFilled, Shop } from '@element-plus/icons-vue'
 
+const router = useRouter()
 const route = useRoute()
 const isCollapse = ref(false)
+const currentAside = ref('')
 
-const currentAside = computed(() => {
-  return route.meta.menuIndex || route.path
+// 设置当前菜单项
+const checkMenu = () => {
+  const savedIndex = localStorage.getItem('activeMenuIndex')
+  if (savedIndex) {
+    currentAside.value = savedIndex
+  } else {
+    const path = router.currentRoute.value.path
+    if (path.includes('/main/allchatlog')) currentAside.value = '2'
+    else if (path.includes('/main/chatlog')) currentAside.value = '3'
+    else currentAside.value = '1'
+  }
+}
+
+const handleMenu = (item: string, curr: string) => {
+  currentAside.value = curr
+  localStorage.setItem('activeMenuIndex', curr)
+  router.push(item)
+}
+
+const handleOpen = () => {}
+const handleClose = () => {}
+
+onMounted(() => {
+  checkMenu()
 })
 
-onMounted(()=>{
-  currentAside.value
+watch(() => route.path, () => {
+  checkMenu()
 })
 </script>
-
 
 
 <style scoped lang="scss">
 .container {
   height: 100vh;
-  background-color: #2B3037;
-  transition: width 0.3s;
-  overflow: hidden;
-
+  transition: width 0.3s ease;
   width: 200px;
+  overflow: hidden;
+  background:linear-gradient(to bottom right, #479db0, #92a7aa);
+  // border-right: 1px solid rgba(255, 255, 255, 0.05);
 
   &.collapsed {
     width: 64px;
   }
 
   .top-info {
-    display: flex;
     height: 60px;
-    // background-color: #2893E5;
-    overflow: hidden;
+    display: flex;
     justify-content: center;
     align-items: center;
+    background-color:#479db0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.04);
 
-
-    .fade-slide-enter-active,
-    .fade-slide-leave-active {
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    .fade-slide-enter-from,
-    .fade-slide-leave-to {
-      opacity: 0;
-      transform: translateX(-10px);
-    }
-
-    .mb-2 {
-      line-height: 60px;
-      text-align: center;
-      color: #9be0e3;
-
-      white-space: nowrap; // 防止换行
-    }
-  }
-
-
-
-  .el-menu {
-    background-color: transparent;
-    height: 100%; // 占满父容器高度
-    overflow: hidden; // 防止菜单内容溢出
-    max-width: 100%;
-    overflow: hidden;
-
-    .el-menu-item {
-      &.is-active {
-        background-color: #202329;
-      }
-    }
-
-    .el-menu-item:hover {
-      background-color: #719ed9 !important;
+    .system-title {
+      margin-left: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color:rgb(220, 214, 214);
+      white-space: nowrap;
     }
   }
 
   .toggle-btn {
-    height: 40px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color:rgb(220, 214, 214);
+    background-color:rgba(36, 98, 148, 0.15);
     cursor: pointer;
+    // border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background-color 0.3s;  
+
+    &:hover {
+      background-color: rgba(2, 37, 94, 0.15);
+    }
+  }
+
+  .fade-slide-enter-active,
+  .fade-slide-leave-active {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .fade-slide-enter-from,
+  .fade-slide-leave-to {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  .el-menu {
+    background-color: transparent;
+    border-right: none;
+    padding-top: 10px;
+
+    .el-menu-item {
+      transition: all 0.2s ease;
+      font-size: 14px;
+      padding-left: 18px;
+
+      &:hover {
+        background-color: rgba(29, 78, 117, 0.08) !important;
+      }
+
+      &.is-active {
+        background-color: rgba(21, 83, 135, 0.15) !important;
+        color: #325777 !important;
+        border-left: 3px solid rgba(21, 83, 135, 0.15);
+      }
+
+      .el-icon {
+        margin-right: 8px;
+      }
+
+      span {
+        font-weight: 500;
+      }
+    }
   }
 }
 </style>
