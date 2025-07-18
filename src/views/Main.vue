@@ -23,7 +23,7 @@
 <script lang='ts' setup name='Main'>
 import { onMounted } from 'vue'
 import MainAside from '../components/MainAside.vue';
-import MainHeader from '../components/MainHeader.vue';
+//import MainHeader from '../components/MainHeader.vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()

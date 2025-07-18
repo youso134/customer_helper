@@ -34,10 +34,11 @@ export interface Register {
 
 export interface updated {
   uid?:number;
-  userName?: string;  
-  userRole?: string;   
+  userName?: string;    
   avatar?: string;     
-  gender?: "male" ;
-  phone?: "13800000000";     
-  email?: "123@qq.com";      
+  gender?: "male"|"female"|"other"; 
+  phone?: number;     
+  email?: string;
+  userPassword: string;
+  userNewPassword?: string;      
 }
