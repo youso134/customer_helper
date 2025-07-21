@@ -56,3 +56,10 @@ export function getUser(userAccount:any) {
     data: JSON.stringify({'userAccount':userAccount})
   });
 }
+
+export function getTypeCount() {
+  return request({
+    url: "type/getTypeCount",
+    method: "get",
+  });
+}

@@ -21,7 +21,7 @@
       <el-dropdown>
         <span class="el-dropdown-link">
           <img
-            src="https://api.dicebear.com/9.x/adventurer/svg?seed=Mackenzie"
+            src="https://plus.unsplash.com/premium_photo-1752155109947-539988d49e5d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
             class="user-avatar"
           />
           <span class="username">{{ userStore.user.userName }}</span>
@@ -84,7 +84,7 @@ onMounted(() => {
   padding: 0 24px;
   box-sizing: border-box;
 
-  background: linear-gradient(90deg, #479db0, #8cb7e3);
+  background-color:#1f2c3a;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
@@ -138,20 +138,20 @@ onMounted(() => {
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        border: 2px solid #1b5e6d;
+        border: 2px solid #ffffff;
         margin-right: 10px;
         object-fit: cover;
       }
 
       .username {
         font-size: 14px;
-        color: #032f39;
+        color: #cccdce;
         margin-right: 6px;
         font-weight: 500;
       }
 
       .el-icon--right {
-        color: #032f39;
+        color: #cccdce;
         font-size: 14px;
       }
     }
