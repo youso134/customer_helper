@@ -1,21 +1,30 @@
 <template>
   <div class="container">
-    <el-button class="mt-4" style="width: 100px; margin-bottom: 20px;" @click="onAddItem">
+    <el-button class="mt-4" :disabled="isAdd" style="width: 100px; margin-bottom: 20px;" @click="onAddItem">
       添加分类
     </el-button>
 
-    <el-table :data="innerTableData" style="width: 100%" max-height="250">
+    <el-table :data="innerTableData" style="width: 100%" max-height="600">
       <el-table-column prop="tid" label="id" width="60" />
 
       <el-table-column label="分类名" width="240">
         <template #default="scope">
-          <!-- 编辑态 -->
+          <!-- 编辑 -->
           <template v-if="isEditing(scope.row)">
             <el-input v-model="editValue" size="small" autofocus @keyup.enter="confirmEdit(scope.row)"
-              @keyup.esc="cancelEdit" @blur="cancelEdit" />
+              @keyup.esc="cancelEdit" @blur="onEditBlur(scope.row)">
+              <template #suffix>
+                <el-icon class="clickable-confirm" @mousedown.prevent @click.stop="confirmEdit(scope.row)">
+                  <Check />
+                </el-icon>
+              </template>
+            </el-input>
+
+            <!-- <el-input v-model="editValue" size="small" autofocus @keyup.enter="confirmEdit(scope.row)"
+              @keyup.esc="cancelEdit" @blur="cancelEdit" /> -->
           </template>
 
-          <!-- 展示态 -->
+          <!-- 展示 -->
           <template v-else>
             {{ scope.row.type }}
           </template>
@@ -41,6 +50,8 @@ import { ref, watch, toRefs } from 'vue'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
 import type { Type } from '@/stores/types'
 import { addType, updateType, deleteType } from '@/apis/typeApi'
+import { Check } from '@element-plus/icons-vue'
+
 
 
 /** ---------- Props ---------- */
@@ -61,6 +72,8 @@ const emit = defineEmits<{
 /** ---------- 内部数据 ---------- */
 const innerTableData = ref<Type[]>([])
 let isAdd = ref(false)
+const skipBlur = ref(false)  // 用于阻止 blur 时误删
+
 
 // 同步 props -> 内部数据
 watch(
@@ -115,9 +128,10 @@ function validateName(name: string, currentId: number): boolean {
 }
 
 /** 确认编辑 */
-async function confirmEdit(row: Type) {
-  if (!validateName(editValue.value, row.tid)) return
+const confirmEdit = async (row: Type) => {
+  skipBlur.value = true  // 告诉 blur 忽略本次（因为用户点了确认)
 
+  if (!validateName(editValue.value, row.tid)) return
   const loading = ElLoading.service({
     lock: true,
     text: '保存中...',
@@ -149,6 +163,34 @@ async function confirmEdit(row: Type) {
     loading.close()
   }
 }
+
+// 编辑框失去焦点
+const onEditBlur = (row: Type) => {
+  // 如果 blur 是因为我们刚点击了确认按钮（见 confirmEdit），则忽略
+  if (skipBlur.value) {
+    skipBlur.value = false
+    return
+  }
+
+  // 如果是“新增但未确认” -> 删除这条临时数据
+  if (isAdd.value && row.tid === editingId.value) {
+    const idx = innerTableData.value.findIndex((r) => r.tid === row.tid)
+    if (idx > -1) {
+      innerTableData.value.splice(idx, 1)
+      // emit('update:categoryOptions', [...innerTableData.value])
+    }
+    // 重置状态
+    isAdd.value = false
+    editingId.value = null
+    editValue.value = ''
+    ElMessage.info('已取消新增分类。')
+    return
+  }
+
+  // 非新增：当作取消编辑
+  cancelEdit()
+}
+
 
 function onAddItem() {
   const newRow: Type = {
@@ -190,5 +232,17 @@ function deleteRow(row: Type) {
   display: flex;
   flex-direction: column;
   padding: 0;
+
+
+  .clickable-confirm {
+    cursor: pointer; // 鼠标指针变成手型
+    color: var(--el-text-color-regular);
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+
+  .clickable-confirm:hover {
+    color: var(--el-color-primary); // 鼠标移上时颜色变成主题色
+    transform: scale(1.2);
+  }
 }
 </style>
