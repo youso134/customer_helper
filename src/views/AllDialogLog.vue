@@ -82,8 +82,7 @@
       <AddChats ref="addChatsRef" @submit-success="uploadDialogVisible = false" />
     </el-dialog>
 
-    <el-dialog v-model="editTypesDialogVisible" title="编辑分类" width="500px" :close-on-click-modal="false"
-      @closed="typesDialogClosed">
+    <el-dialog v-model="editTypesDialogVisible" title="编辑分类" width="500px" :close-on-click-modal="false">
       <!-- <EditTypes :categoryOptions = "categoryOptions"/>  -->
       <EditTypes v-model:categoryOptions="categoryOptions" />
     </el-dialog>
@@ -100,12 +99,9 @@ import { useRouter } from 'vue-router'
 import { ElMessageBox } from 'element-plus'
 import 'element-plus/theme-chalk/el-overlay.css';
 import 'element-plus/theme-chalk/el-message-box.css';
-// import { useDialogStore } from '@/stores/index'
 import ChatDetail from '@/components/ChatDetail.vue'
 import AddChats from '@/components/AddChats.vue'
 import EditTypes from '@/components/EditTypes.vue'
-
-
 
 
 const router = useRouter()
@@ -125,15 +121,8 @@ const handleBatchClosed = () => {
   handleSearch()
 }
 
-const typesDialogClosed = () => {
-  // getCate()
-  // handleSearch()
-}
-
 
 const totalAmount = ref(0)
-// const currentDg = useDialogStore()
-
 
 const rawDialogData = ref({
   "did": 111,
@@ -193,12 +182,10 @@ const rawChatData = ref([
 ])
 
 const getCate = async () => {
-  categoryOptions.value = await getAllType()
-
-  // categoryTableData.value = [...categoryOptions.value.filter((item: any) => item !== null)
-  //   .map((item: any) => item.type)]
+  categoryOptions.value = await getAllType();
 }
 
+// 监视categoryOptions，一出现变化即改变当前页面显示的数据categoryTableData
 watch(categoryOptions, (newVal) => {
   categoryTableData.value = [...newVal.filter((item: any) => item !== null)
     .map((item: any) => item.type)]
@@ -214,7 +201,7 @@ const handleCurrentChange = (val: number) => {
 }
 
 const handleSearch = async () => {
-  // if(sendData.value.type === '') sendData.value.type = null
+
   if (sendData.value.searchContent === '') sendData.value.searchContent = null
   const res = await getDialoguePage(sendData.value)
   contentData.value = res.records
@@ -228,7 +215,7 @@ const handleSearch = async () => {
     }
   })
 }
-const goDetail = async (index: any, row: any) => {
+const goDetail = async (_index: any, row: any) => {
   dialogVisible.value = true
   try {
     const res = await getDialogueDetailByDid({ did: row.did })
@@ -238,7 +225,7 @@ const goDetail = async (index: any, row: any) => {
   }
 
 }
-const goEdit = (index: any, row: any) => {
+const goEdit = (_index: any, row: any) => {
   // localStorage.setItem('activeMenuIndex', '3')
   // currentDg.setCurrentDialog(row)
   router.push({
@@ -247,7 +234,7 @@ const goEdit = (index: any, row: any) => {
     }
   })
 }
-const confirmDelete = (index: any, row: any) => {
+const confirmDelete = (_index: any, row: any) => {
   ElMessageBox.confirm(
     '确认删除这条记录吗？操作不可撤销。',
     '提示',
@@ -259,7 +246,7 @@ const confirmDelete = (index: any, row: any) => {
   )
     .then(async () => {
       try {
-        const res = await deleteByDid({ did: row.did })
+        await deleteByDid({ did: row.did })
         ElMessage.success('删除成功')
         handleSearch() // 重新刷新列表
       } catch (error) {
@@ -322,7 +309,6 @@ onMounted(() => {
     width: 95%;
     overflow: auto;
     gap: 40px;
-    padding: 5px;
 
     .type {
       height: 80%;
