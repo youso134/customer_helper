@@ -305,7 +305,6 @@ onMounted(() => {
     width: 95%;
     overflow: auto;
     gap: 40px;
-    padding: 5px;
 
     .type {
       height: 80%;
