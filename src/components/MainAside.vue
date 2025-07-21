@@ -33,7 +33,7 @@
       <el-menu-item index="/main/alldialoglog">
         <el-icon><Document /></el-icon>
         <transition name="fade-slide">
-          <span v-if="!isCollapse">查看全部聊天记录</span>
+          <span v-if="!isCollapse">管理聊天记录</span>
         </transition>
       </el-menu-item>
 
@@ -44,17 +44,17 @@
         </transition>
       </el-menu-item>
 
-      <el-menu-item index="/main/addchats">
+      <!-- <el-menu-item index="/main/addchats">
         <el-icon><UploadFilled /></el-icon>
         <transition name="fade-slide">
           <span v-if="!isCollapse">批量添加聊天记录</span>
         </transition>
-      </el-menu-item>
+      </el-menu-item> -->
 
       <el-menu-item index="/main/allchats">
         <el-icon><Tickets /></el-icon>
         <transition name="fade-slide">
-          <span v-if="!isCollapse">所有消息管理</span>
+          <span v-if="!isCollapse">管理聊天消息</span>
         </transition>
       </el-menu-item>
     </el-menu>

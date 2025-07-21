@@ -22,7 +22,6 @@ export interface Chat {
   type?: 'C' | 'U'
 }
 
-
 export interface DialogueItem {
 	did:number,
 	consumerId:Number,
@@ -30,8 +29,14 @@ export interface DialogueItem {
 	type:string,
 	resume:string,
 	highlight:string,
-  createTime: string
+  createTime: string,
   editTime?: string
+}
+export interface Type {
+	tid:number,
+	type:string,
+  createTime?: string,
+  editTime?: string,
 }
 
 export interface Register {

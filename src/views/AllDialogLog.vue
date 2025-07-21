@@ -3,34 +3,46 @@
     <!-- 搜索区域 -->
     <div class="search">
       <!-- 搜索框 -->
-      <el-input maxlength="15" show-word-limit v-model="sendData.searchContent" placeholder="请输入关键字搜索" clearable
-        class="search-input" />
+      <el-input maxlength="10" show-word-limit v-model="sendData.searchContent" placeholder="请输入关键字搜索" clearable
+        style="width: 240px;" />
+      <el-input maxlength="4" show-word-limit v-model="sendData.clientId" style="width: 120px;" placeholder="客服id"
+        clearable />
+      <el-input maxlength="4" show-word-limit v-model="sendData.consumerId" style="width: 120px;" placeholder="顾客id"
+        clearable />
+
 
       <!-- 分类筛选 -->
       <div class="filter-category">
-        <el-select v-model="sendData.type" placeholder="请选择分类" clearable>
-          <el-option v-for="cate in categoryOptions" :key="cate" :label="cate" :value="cate" />
+        <el-select v-model="sendData.type" style="width: 200px;" placeholder="请选择分类" clearable>
+          <el-option v-for="cate in categoryTableData" :key="cate" :label="cate" :value="cate" />
         </el-select>
       </div>
 
-      <el-button type="primary" @click="handleSearch">Search</el-button>
+      <div class="buttons">
+        <el-button type="primary" @click="handleSearch">搜索</el-button>
+        <el-button type="success" @click="editTypesDialogVisible = true">编辑分类</el-button>
+        <el-button type="default" @click="uploadDialogVisible = true">批量上传</el-button>
+
+      </div>
+
     </div>
 
     <!-- 内容展示区域 -->
     <div class="content">
-      <el-table :data="contentData" style="width: 100%">
+
+      <el-table :data="contentData" style="width: 90%">
         <el-table-column label="序号" width="80">
           <template #default="scope">
             {{ (sendData.currentPage - 1) * sendData.pageSize + scope.$index + 1 }}
           </template>
         </el-table-column>
-        <el-table-column prop="did" label="DID" width="80" />
+        <el-table-column prop="did" label="聊天记录did" width="120" />
         <el-table-column prop="clientId" label="客服id" width="80" />
         <el-table-column prop="consumerId" label="顾客id" width="80" />
-        <el-table-column prop="resume" label="简要概括" />
+        <el-table-column prop="resume" label="简要概括" width="120" />
         <el-table-column prop="sensitiveReason" label="敏感词" width="80" />
 
-        <el-table-column prop="createTimeFmt" label="创建时间" width="160" />
+        <!-- <el-table-column prop="createTimeFmt" label="创建时间" width="160" /> -->
         <el-table-column prop="editTimeFmt" label="编辑时间" width="160" />
         <el-table-column prop="type" label="分类" width="80" />
         <el-table-column label="操作" width="200">
@@ -41,12 +53,13 @@
             <el-button type="primary" size="small" @click="goEdit(scope.$index, scope.row)">
               编辑
             </el-button>
-            <el-button type="danger" size="small" @click="goDelete(scope.$index, scope.row)">
+            <el-button type="danger" size="small" @click="confirmDelete(scope.$index, scope.row)">
               删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
+
     </div>
 
     <div class="demo-pagination-block">
@@ -64,24 +77,59 @@
       <ChatDetail :rawDialogData="rawDialogData" :rawChatData="rawChatData" />
     </el-dialog>
 
+    <el-dialog v-model="uploadDialogVisible" title="批量上传" width="1000px" top="5vh" :close-on-click-modal="false"
+      @closed="handleBatchClosed">
+      <AddChats ref="addChatsRef" @submit-success="uploadDialogVisible = false" />
+    </el-dialog>
+
+    <el-dialog v-model="editTypesDialogVisible" title="编辑分类" width="500px" :close-on-click-modal="false"
+      @closed="typesDialogClosed">
+      <!-- <EditTypes :categoryOptions = "categoryOptions"/>  -->
+      <EditTypes v-model:categoryOptions="categoryOptions" />
+    </el-dialog>
+
   </div>
 </template>
 
 <script lang="ts" setup name="AllDialogLog">
-import { ref, onMounted } from 'vue'
-import { getDialoguePage, getDialogueDetailByDid, deleteByDid, getTypes } from '@/apis/dialogApi'
-import type { DialogueItem } from '@/stores/types'
+import { ref, onMounted, watch } from 'vue'
+import { getDialoguePage, getDialogueDetailByDid, deleteByDid } from '@/apis/dialogApi'
+import { getAllType } from '@/apis/typeApi'
+import type { DialogueItem, Type } from '@/stores/types'
 import { useRouter } from 'vue-router'
+import { ElMessageBox } from 'element-plus'
+import 'element-plus/theme-chalk/el-overlay.css';
+import 'element-plus/theme-chalk/el-message-box.css';
 // import { useDialogStore } from '@/stores/index'
+import ChatDetail from '@/components/ChatDetail.vue'
+import AddChats from '@/components/AddChats.vue'
+import EditTypes from '@/components/EditTypes.vue'
+
+
 
 
 const router = useRouter()
 
-const sendData = ref({ pageSize: 20, currentPage: 1, type: '', searchContent: null })
+const sendData = ref({ pageSize: 20, currentPage: 1, type: '', searchContent: null, consumerId: null, clientId: null })
 let contentData = ref<DialogueItem[]>([])
 // 所有分类选项（也可以动态生成）
-let categoryOptions = ref<string[]>([])
+let categoryOptions = ref<Type[]>([])
+let categoryTableData = ref<string[]>([])
 const dialogVisible = ref(false)
+const editTypesDialogVisible = ref(false)
+const uploadDialogVisible = ref(false)
+
+const addChatsRef = ref<InstanceType<typeof AddChats> | null>(null)
+const handleBatchClosed = () => {
+  addChatsRef.value?.clearAll()
+  handleSearch()
+}
+
+const typesDialogClosed = () => {
+  // getCate()
+  // handleSearch()
+}
+
 
 const totalAmount = ref(0)
 // const currentDg = useDialogStore()
@@ -145,10 +193,17 @@ const rawChatData = ref([
 ])
 
 const getCate = async () => {
-  const res = await getTypes();
-  categoryOptions.value = [...res.filter((item: any) => item !== null)
-    .map((item: any) => item.type)]
+  categoryOptions.value = await getAllType()
+
+  // categoryTableData.value = [...categoryOptions.value.filter((item: any) => item !== null)
+  //   .map((item: any) => item.type)]
 }
+
+watch(categoryOptions, (newVal) => {
+  categoryTableData.value = [...newVal.filter((item: any) => item !== null)
+    .map((item: any) => item.type)]
+}, { immediate: true, deep: true })
+
 const handleSizeChange = (val: number) => {
   sendData.value.pageSize = val
   handleSearch()
@@ -192,14 +247,30 @@ const goEdit = (index: any, row: any) => {
     }
   })
 }
-const goDelete = async (index: any, row: any) => {
-  try {
-    const res = await deleteByDid({ did: row.did })
-    ElMessage.success('删除成功！')
-    handleSearch()
-  } catch (error) {
-  }
+const confirmDelete = (index: any, row: any) => {
+  ElMessageBox.confirm(
+    '确认删除这条记录吗？操作不可撤销。',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      try {
+        const res = await deleteByDid({ did: row.did })
+        ElMessage.success('删除成功')
+        handleSearch() // 重新刷新列表
+      } catch (error) {
+        ElMessage.error('删除失败')
+      }
+    })
+    .catch(() => {
+      ElMessage.info('已取消删除')
+    })
 }
+
 
 const formatDate = (str: string) => {
   if (!str) return ''
@@ -208,7 +279,6 @@ const formatDate = (str: string) => {
 }
 
 onMounted(() => {
-  // parseChatData(rawData)
   getCate()
   handleSearch()
 })
@@ -241,12 +311,26 @@ onMounted(() => {
     .filter-category {
       width: 200px;
     }
+
   }
 
+
+
   .content {
+    display: flex;
     height: 80%;
-    width: 90%;
+    width: 95%;
     overflow: auto;
+    gap: 40px;
+    padding: 5px;
+
+    .type {
+      height: 80%;
+      width: 20%;
+      overflow: auto;
+    }
+
+
   }
 
   .demo-pagination-block {

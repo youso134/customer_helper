@@ -43,12 +43,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/AddorEditChat.vue"),
         meta: { title:"编辑聊天记录",menuIndex: "/main/addoreditchat" },
       },
-      {
-        path: "addchats",
-        name: "addchats",
-        component: () => import("@/views/AddChats.vue"),
-        meta: { title:"添加聊天记录",menuIndex: "/main/addchats" },
-      },
+      // {
+      //   path: "addchats",
+      //   name: "addchats",
+      //   component: () => import("@/views/AddChats.vue"),
+      //   meta: { menuIndex: "/main/addchats" },
+      // },
       {
         path: "allchats",
         name: "allchats",

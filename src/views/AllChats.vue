@@ -13,7 +13,7 @@
         </el-select>
       </div>
 
-      <el-button type="primary" @click="handleSearch">Search</el-button>
+      <el-button type="primary" @click="handleSearch">搜索</el-button>
     </div>
 
     <!-- 内容展示区域 -->
@@ -28,7 +28,7 @@
         <el-table-column prop="did" label="DID" width="80" />
         <el-table-column prop="clientId" label="客服id" width="80" />
         <el-table-column prop="consumerId" label="顾客id" width="80" />
-        <el-table-column prop="content" label="内容" />
+        <el-table-column prop="content" label="内容" width="240" />
         <el-table-column prop="role" label="角色" width="80" />
         <el-table-column prop="sensitiveReason" label="敏感词" width="80" />
         <!-- <el-table-column prop="createTime" label="创建时间" width="160" /> -->
@@ -39,7 +39,7 @@
             <el-button type="primary" size="small" @click="goEdit(scope.$index, scope.row)">
               编辑
             </el-button>
-            <el-button type="danger" size="small" @click="goDelete(scope.$index, scope.row)">
+            <el-button type="danger" size="small" @click="confirmDelete(scope.$index, scope.row)">
               删除
             </el-button>
           </template>
@@ -55,26 +55,25 @@
     </div>
 
 
-
-    <el-dialog v-model="dialogVisible" title="编辑信息" width="500px">
-      <el-form :model="editForm" label-width="80px">
-        <!-- <el-form-item label="客服ID" v-if="editForm.clientId !== undefined">
-          <el-input v-model="editForm.clientId" />
-        </el-form-item> -->
+    <el-dialog class="edit-dialog" v-model="dialogVisible" title="编辑信息" width="600px" align-center>
+      <el-form :model="editForm" label-width="80px" class="edit-form">
         <el-form-item label="角色" v-if="editForm.role !== undefined">
-
-          <el-select v-model="editForm.role" placeholder="角色">
+          <el-select v-model="editForm.role" placeholder="请选择角色" style="width: 100%;">
             <el-option v-for="cate in roleList" :key="cate" :label="cate" :value="cate" />
           </el-select>
-
         </el-form-item>
         <el-form-item label="内容" v-if="editForm.content !== undefined">
-          <el-input v-model="editForm.content" type="textarea" style="height: 400px;" />
+          <el-input v-model="editForm.content" type="textarea" :autosize="{ minRows: 10, maxRows: 20 }"
+            placeholder="请输入内容" />
         </el-form-item>
       </el-form>
+
+      <!-- 自定义底部 -->
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="submitEdit">保存</el-button>
+        <div class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitEdit">保存</el-button>
+        </div>
       </template>
     </el-dialog>
 
@@ -86,7 +85,9 @@
 import { ref, onMounted } from 'vue'
 import { getChatPage, deleteByCid, updateByCid } from '@/apis/chatApi'
 import type { DialogueItem } from '@/stores/types'
-
+import { ElMessageBox } from 'element-plus'
+import 'element-plus/theme-chalk/el-overlay.css';
+import 'element-plus/theme-chalk/el-message-box.css';
 
 const sendData = ref({ pageSize: 10, currentPage: 1, type: '', searchContent: null })
 let contentData = ref<DialogueItem[]>([])
@@ -203,16 +204,31 @@ const submitEdit = async () => {
   } catch (error) {
     ElMessage.error("提交出错了")
   }
-  
+
 }
 
-const goDelete = async (index: any, row: any) => {
-  try {
-    const res = await deleteByCid({ cid: row.cid })
-    ElMessage.success('删除成功！')
-    handleSearch()
-  } catch (error) {
-  }
+const confirmDelete = (index: any, row: any) => {
+  ElMessageBox.confirm(
+    '确认删除这条记录吗？操作不可撤销。',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      try {
+        const res = await deleteByCid({ cid: row.cid })
+        ElMessage.success('删除成功')
+        handleSearch() // 重新刷新列表
+      } catch (error) {
+        ElMessage.error('删除失败')
+      }
+    })
+    .catch(() => {
+      ElMessage.info('已取消删除')
+    })
 }
 
 const formatDate = (str: string) => {
@@ -270,6 +286,28 @@ onMounted(() => {
 
     // position: sticky; // 粘性布局
     // bottom: 0; // 粘在底部
+  }
+
+
+  .edit-dialog {
+    .el-dialog__header {
+      font-size: 18px;
+      font-weight: bold;
+      // padding: 15px 20px;
+      padding-left: 30px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .edit-form {
+      padding: 20px 40px 0 0;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 0 40px 20px 0;
+    }
   }
 
 }
