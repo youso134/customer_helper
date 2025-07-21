@@ -78,7 +78,7 @@ const currentAside = computed(() => {
 <style scoped lang="scss">
 .container {
   height: 100vh;
-  background-color: #449fb3;
+  background-color: #1f2c3a;
   transition: width 0.3s;
   overflow: hidden;
   width: 200px;
@@ -124,7 +124,7 @@ const currentAside = computed(() => {
       align-items: center;
 
       &.is-active {
-        background-color: #0c7289;
+        background-color: #545b61;
       }
 
       &:hover {
