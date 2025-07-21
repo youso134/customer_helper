@@ -43,12 +43,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/AddorEditChat.vue"),
         meta: { menuIndex: "/main/addoreditchat" },
       },
-      {
-        path: "addchats",
-        name: "addchats",
-        component: () => import("@/views/AddChats.vue"),
-        meta: { menuIndex: "/main/addchats" },
-      },
+      // {
+      //   path: "addchats",
+      //   name: "addchats",
+      //   component: () => import("@/views/AddChats.vue"),
+      //   meta: { menuIndex: "/main/addchats" },
+      // },
       {
         path: "allchats",
         name: "allchats",

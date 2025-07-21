@@ -27,7 +27,7 @@
     <div class="main-content">
       <!-- <ChatDetail :chatList="chatList" :highLight="highLight" :currentMsg="currentMsg" /> -->
 
-      <el-table :data="rawChatData" style="width: 80%">
+      <el-table :data="rawChatData" style="width: 100%">
         <!-- <el-table-column type="selection" width="55"></el-table-column> -->
         <!-- <el-table-column prop="cid" label="CID" width="80" /> -->
         <el-table-column prop="did" label="聊天记录DID" width="120" />
@@ -36,8 +36,8 @@
         <el-table-column prop="content" label="内容" />
         <el-table-column prop="role" label="角色" width="80" />
         <!-- <el-table-column prop="createTime" label="创建时间" width="160" /> -->
-        <el-table-column prop="createTimeFmt" label="创建时间" width="160" />
-        <el-table-column prop="editTimeFmt" label="编辑时间" width="160" />
+        <!-- <el-table-column prop="createTimeFmt" label="创建时间" width="160" /> -->
+        <!-- <el-table-column prop="editTimeFmt" label="编辑时间" width="160" /> -->
       </el-table>
 
     </div>
@@ -75,7 +75,7 @@
 
 <script lang='ts' setup name="AllChats">
 import { onMounted, ref } from 'vue'
-import {addDialogueByBatch } from '@/apis/dialogApi'
+import { addDialogueByBatch } from '@/apis/dialogApi'
 import type { Chat } from '@/stores/types'
 import * as XLSX from 'xlsx'
 
@@ -172,12 +172,14 @@ const addChat = () => {
 
 }
 // 清除数据 恢复默认
-// const clearAll = () => {
-//   rawChatData.value = []
-//   rawDialogData.value = []
-//   consumerId.value = ''
-//   clientId.value = ''
-// }
+const clearAll = () => {
+  rawChatData.value = []
+  rawDialogData.value = []
+  consumerId.value = ''
+  clientId.value = ''
+}
+defineExpose({ clearAll })
+const emit = defineEmits(['submit-success'])
 
 // 提交chats
 const submitChats = async () => {
@@ -186,9 +188,11 @@ const submitChats = async () => {
     return
   }
   try {
-    const res = await addDialogueByBatch({'chatList':rawChatData.value})
+    const res = await addDialogueByBatch({ 'chatList': rawChatData.value })
     console.log(res)
     ElMessage.success('上传成功！')
+    clearAll()
+    emit('submit-success')
   } catch (error) {
   }
 }
@@ -248,9 +252,11 @@ const handleFileChange = async (event: Event) => {
   } catch (error) {
     console.error('文件读取错误', error)
     ElMessage.error('文件读取失败，请检查文件格式')
+  } finally {
+    // 清空数据防止多次上传同一个文件不显示
+    fileInput.value!.value = ''
   }
 }
-
 
 onMounted(() => {
 
@@ -263,6 +269,7 @@ onMounted(() => {
   padding: 30px;
   display: flex;
   flex-direction: column;
+  // width: 1000px;
   // align-items: center;
 
   .inputs {
@@ -290,7 +297,6 @@ onMounted(() => {
   .main-content {
     display: flex;
     width: 100%;
-    // max-width: 1000px;
     margin-top: 20px;
   }
 

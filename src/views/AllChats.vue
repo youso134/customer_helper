@@ -13,7 +13,7 @@
         </el-select>
       </div>
 
-      <el-button type="primary" @click="handleSearch">Search</el-button>
+      <el-button type="primary" @click="handleSearch">搜索</el-button>
     </div>
 
     <!-- 内容展示区域 -->
