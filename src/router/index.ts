@@ -21,7 +21,6 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/main",
     name: "main",
-    redirect:"/main/user",
     component: () => import("@/views/Main.vue"),
     meta: { title:"主页",menuIndex: "/main" },
     children: [

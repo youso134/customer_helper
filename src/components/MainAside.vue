@@ -23,6 +23,12 @@
       :default-active="currentAside as string"
       router
     >
+        <el-menu-item index="/main">
+        <el-icon><House /></el-icon>
+        <transition name="fade-slide">
+          <span v-if="!isCollapse">主页</span>
+        </transition>
+      </el-menu-item>
       <el-menu-item index="/main/user">
         <el-icon><House /></el-icon>
         <transition name="fade-slide">
@@ -78,7 +84,7 @@ const currentAside = computed(() => {
 <style scoped lang="scss">
 .container {
   height: 100vh;
-  background-color: #1f2c3a;
+  background-color: #3a4047;
   transition: width 0.3s;
   overflow: hidden;
   width: 200px;

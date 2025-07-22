@@ -57,9 +57,3 @@ export function getUser(userAccount:any) {
   });
 }
 
-export function getTypeCount() {
-  return request({
-    url: "type/getTypeCount",
-    method: "get",
-  });
-}
