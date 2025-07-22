@@ -10,7 +10,6 @@
       <el-input maxlength="4" show-word-limit v-model="sendData.consumerId" style="width: 120px;" placeholder="顾客id"
         clearable />
 
-
       <!-- 分类筛选 -->
       <div class="filter-category">
         <el-select v-model="sendData.type" style="width: 200px;" placeholder="请选择分类" clearable>
@@ -37,7 +36,7 @@
         <el-table-column prop="did" label="聊天记录did" width="120" />
         <el-table-column prop="clientId" label="客服id" width="80" />
         <el-table-column prop="consumerId" label="顾客id" width="80" />
-        <el-table-column prop="resume" label="简要概括" width="120" />
+        <el-table-column prop="resume" label="简要概括" width="300" />
         <el-table-column prop="sensitiveReason" label="敏感词" width="80" />
 
         <!-- <el-table-column prop="createTimeFmt" label="创建时间" width="160" /> -->
@@ -80,7 +79,7 @@
       <AddChats ref="addChatsRef" @submit-success="uploadDialogVisible = false" />
     </el-dialog>
 
-    <el-dialog v-model="editTypesDialogVisible" title="编辑分类" width="600px" :close-on-click-modal="false">
+    <el-dialog v-model="editTypesDialogVisible" title="编辑分类" width="600px" :close-on-click-modal="false" @closed="handleSearch()">
       <!-- <EditTypes :categoryOptions = "categoryOptions"/>  -->
       <EditTypes v-model:categoryOptions="categoryOptions" />
     </el-dialog>
@@ -122,62 +121,66 @@ const handleBatchClosed = () => {
 
 const totalAmount = ref(0)
 
-const rawDialogData = ref({
-  "did": 111,
-  "consumerId": 233,
-  "clientId": 233,
-  "editTime": "2025-07-16T00:38:36.000+00:00",
-  "createTime": "2025-07-15T01:20:02.000+00:00",
-  "type": "投诉",
-  "resume": "客户进行了投诉",
-  "highlight": "投诉"
-})
-const rawChatData = ref([
-  {
-    "cid": 1001,
-    "did": 111,
-    "consumerId": 233,
-    "clientId": 233,
-    "content": "您好，这里是默认的数据",
-    "role": "顾客",
-    "sensitiveReason": "保修",
-    "editTime": "2025-07-16T00:52:27.000+00:00",
-    "createTime": "2023-05-10T01:15:22.000+00:00"
-  },
-  {
-    "cid": 1002,
-    "did": 111,
-    "consumerId": 233,
-    "clientId": 233,
-    "content": "我们的产品保修期是1年，如果有任何质量问题可以联系我们。",
-    "role": "客服",
-    "sensitiveReason": "质量",
-    "editTime": "2025-07-16T00:52:27.000+00:00",
-    "createTime": "2023-05-10T01:16:30.000+00:00"
-  },
-  {
-    "cid": 1003,
-    "did": 111,
-    "consumerId": 233,
-    "clientId": 233,
-    "content": "好的。另外我想问下付款方式。我可以用信用卡吗？",
-    "role": "顾客",
-    "sensitiveReason": null,
-    "editTime": "2025-07-16T00:52:27.000+00:00",
-    "createTime": "2023-05-10T01:18:45.000+00:00"
-  },
-  {
-    "cid": 1004,
-    "did": 111,
-    "consumerId": 233,
-    "clientId": 233,
-    "content": "客服将在2分钟内回复您的问题，请稍候...",
-    "role": "客服",
-    "sensitiveReason": null,
-    "editTime": "2025-07-16T00:52:27.000+00:00",
-    "createTime": "2023-05-10T01:19:00.000+00:00"
-  }
-])
+const rawDialogData = ref({})
+const rawChatData = ref([])
+
+
+// const rawDialogData = ref({
+//   "did": 111,
+//   "consumerId": 233,
+//   "clientId": 233,
+//   "editTime": "2025-07-16T00:38:36.000+00:00",
+//   "createTime": "2025-07-15T01:20:02.000+00:00",
+//   "type": "投诉",
+//   "resume": "客户进行了投诉",
+//   "highlight": "投诉"
+// })
+// const rawChatData = ref([
+//   {
+//     "cid": 1001,
+//     "did": 111,
+//     "consumerId": 233,
+//     "clientId": 233,
+//     "content": "您好，这里是默认的数据",
+//     "role": "顾客",
+//     "sensitiveReason": "保修",
+//     "editTime": "2025-07-16T00:52:27.000+00:00",
+//     "createTime": "2023-05-10T01:15:22.000+00:00"
+//   },
+//   {
+//     "cid": 1002,
+//     "did": 111,
+//     "consumerId": 233,
+//     "clientId": 233,
+//     "content": "我们的产品保修期是1年，如果有任何质量问题可以联系我们。",
+//     "role": "客服",
+//     "sensitiveReason": "质量",
+//     "editTime": "2025-07-16T00:52:27.000+00:00",
+//     "createTime": "2023-05-10T01:16:30.000+00:00"
+//   },
+//   {
+//     "cid": 1003,
+//     "did": 111,
+//     "consumerId": 233,
+//     "clientId": 233,
+//     "content": "好的。另外我想问下付款方式。我可以用信用卡吗？",
+//     "role": "顾客",
+//     "sensitiveReason": null,
+//     "editTime": "2025-07-16T00:52:27.000+00:00",
+//     "createTime": "2023-05-10T01:18:45.000+00:00"
+//   },
+//   {
+//     "cid": 1004,
+//     "did": 111,
+//     "consumerId": 233,
+//     "clientId": 233,
+//     "content": "客服将在2分钟内回复您的问题，请稍候...",
+//     "role": "客服",
+//     "sensitiveReason": null,
+//     "editTime": "2025-07-16T00:52:27.000+00:00",
+//     "createTime": "2023-05-10T01:19:00.000+00:00"
+//   }
+// ])
 
 const getCate = async () => {
   categoryOptions.value = await getAllType()
@@ -311,7 +314,6 @@ onMounted(() => {
       width: 20%;
       overflow: auto;
     }
-
 
   }
 

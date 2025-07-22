@@ -72,13 +72,11 @@
   </div>
 </template>
 
-
 <script lang='ts' setup name="AllChats">
 import { onMounted, ref } from 'vue'
 import { addDialogueByBatch } from '@/apis/dialogApi'
 import type { Chat } from '@/stores/types'
 import * as XLSX from 'xlsx'
-
 
 const inputmsg = ref<string>('')
 const addDialogVisible = ref(false)
@@ -91,8 +89,6 @@ let consumerId = ref()
 let clientId = ref()
 let did = ref()
 let role = ref('顾客')
-
-
 
 // const currentDg = useDialogStore()
 const rawDialogData = ref({
@@ -187,14 +183,38 @@ const submitChats = async () => {
     ElMessage.warning('聊天记录不能为空，请先上传或添加数据')
     return
   }
-  try {
-    const res = await addDialogueByBatch({ 'chatList': rawChatData.value })
-    console.log(res)
-    ElMessage.success('上传成功！')
-    clearAll()
-    emit('submit-success')
-  } catch (error) {
-  }
+
+  ElMessageBox.confirm(
+    '确认上传聊天记录吗？',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(async () => {
+    const loading = ElLoading.service({
+      lock: true,
+      text: '保存中...',
+      background: 'rgba(0, 0, 0, 0.3)',
+    })
+    try {
+      const res = await addDialogueByBatch({ 'chatList': rawChatData.value })
+      console.log(res)
+      ElMessage.success('上传成功！')
+      clearAll()
+      emit('submit-success')
+
+    } catch (error) {
+      ElMessage.error('上传失败。')
+    } finally {
+      loading.close()
+    }
+  })
+    .catch(() => {
+      ElMessage.info('已取消上传')
+    })
+
 }
 
 const uploadChat = () => {

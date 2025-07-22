@@ -211,19 +211,34 @@ function deleteRow(row: Type) {
     cancelButtonText: '取消',
   })
     .then(async () => {
-      const res = await deleteType({ 'type': row.type })
-      const idx = innerTableData.value.findIndex((r) => r.tid === row.tid)
-      if (idx > -1) {
-        innerTableData.value.splice(idx, 1)
-      }
-      if (editingId.value === row.tid) {
-        cancelEdit()
-      }
-      emit('update:categoryOptions', [...innerTableData.value])
+      const loading = ElLoading.service({
+        lock: true,
+        text: '保存中...',
+        background: 'rgba(0, 0, 0, 0.3)',
+      })
 
-      ElMessage.success('删除成功！')
+      try {
+        const res = await deleteType({ 'type': row.type })
+        const idx = innerTableData.value.findIndex((r) => r.tid === row.tid)
+        if (idx > -1) {
+          innerTableData.value.splice(idx, 1)
+        }
+        if (editingId.value === row.tid) {
+          cancelEdit()
+        }
+        emit('update:categoryOptions', [...innerTableData.value])
+
+        ElMessage.success('删除成功！')
+
+      } catch (error) {
+        ElMessage.error('删除失败')
+      } finally{
+        loading.close()
+      }
     })
-    .catch(() => { })
+    .catch(() => {
+      ElMessage.info('取消删除')
+    })
 }
 </script>
 
