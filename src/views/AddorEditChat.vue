@@ -22,13 +22,12 @@
       <!-- <el-button type="danger" @click="deleteDialogVisible = true">删除消息</el-button> -->
       <el-button type="info" @click="clearAll">恢复默认</el-button>
       <el-button type="success" @click="confirmSubmitChats">确认上传</el-button>
-      <el-checkbox v-model="checked2">上传后自动解析</el-checkbox>
+      <!-- <el-checkbox v-model="checked2">上传后自动解析</el-checkbox> -->
 
     </div>
 
     <!-- 主内容区 -->
     <div class="main-content">
-      <!-- <ChatDetail :chatList="chatList" :highLight="highLight" :currentMsg="currentMsg" /> -->
       <ChatDetail :rawDialogData="rawDialogData" :rawChatData="rawChatData" />
     </div>
 
@@ -72,7 +71,7 @@ import type { Chat } from '@/stores/types'
 import ChatDetail from '@/components/ChatDetail.vue'
 // import { useDialogStore } from '@/stores/index'
 import { useRoute } from 'vue-router'
-import { ElMessageBox } from 'element-plus'
+// import { ElMessageBox, ElLoading } from 'element-plus'
 import 'element-plus/theme-chalk/el-overlay.css';
 import 'element-plus/theme-chalk/el-message-box.css';
 
@@ -93,8 +92,7 @@ let clientLocked = ref(false)
 
 
 
-const rawDialogData = ref({
-})
+const rawDialogData = ref({})
 const rawChatData = ref<Chat[]>([
   // {
   //   "cid": 0,
@@ -213,13 +211,22 @@ const confirmSubmitChats = () => {
     }
   )
     .then(async () => {
+      const loading = ElLoading.service({
+        lock: true,
+        text: '保存中...',
+        background: 'rgba(0, 0, 0, 0.3)',
+      })
+
       try {
         const res = await addOrUpdateChatByBatch(rawChatData.value)
         console.log(res)
         rawDialogData.value = res
+
         ElMessage.success('上传成功！')
       } catch (error) {
         ElMessage.error('上传失败。')
+      } finally {
+        loading.close()
       }
     })
     .catch(() => {

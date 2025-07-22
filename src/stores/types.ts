@@ -16,6 +16,7 @@ export interface Chat {
 	clientId?: number,
 	content?: string,
   role?: string,
+  // type?: string,
 	sensitiveReason?: string | null,
 	editTime?: string,
 	createTime?: string,

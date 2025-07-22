@@ -4,6 +4,16 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
+  "compilerOptions": {
+    "composite": true,  // 添加这一行
+    // "module": "ESNext",
+    // "moduleResolution": "Node",
+    // "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "auto-imports.d.ts"   // 解决elloading等样式丢失问题 要直接引用 直接引用ts报错则加上这一句
+  ]
+
 
   // "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
   // "include": ["src/**/*"]

@@ -2,9 +2,12 @@
   <div class="container">
     <!-- 搜索区域 -->
     <div class="search">
-      <!-- 搜索框 -->
-      <el-input maxlength="15" show-word-limit v-model="sendData.searchContent" placeholder="请输入关键字搜索" clearable
-        class="search-input" />
+      <el-input maxlength="10" show-word-limit v-model="sendData.content" placeholder="请输入关键字搜索" clearable
+        style="width: 240px;" />
+      <el-input maxlength="4" show-word-limit v-model="sendData.clientId" style="width: 120px;" placeholder="客服id"
+        clearable />
+      <el-input maxlength="4" show-word-limit v-model="sendData.consumerId" style="width: 120px;" placeholder="顾客id"
+        clearable />
 
       <!-- 分类筛选 -->
       <div class="filter-category">
@@ -84,13 +87,16 @@
 <script lang="ts" setup name="AllChats">
 import { ref, onMounted } from 'vue'
 import { getChatPage, deleteByCid, updateByCid } from '@/apis/chatApi'
-import type { DialogueItem } from '@/stores/types'
+// import type { DialogueItem } from '@/stores/types'
 import { ElMessageBox } from 'element-plus'
 import 'element-plus/theme-chalk/el-overlay.css';
 import 'element-plus/theme-chalk/el-message-box.css';
 
-const sendData = ref({ pageSize: 10, currentPage: 1, type: '', searchContent: null })
-let contentData = ref<DialogueItem[]>([])
+const sendData = ref({ pageSize: 10, currentPage: 1, type: '', consumerId: null, clientId: null, content: null })
+// let contentData = ref<DialogueItem[]>([])
+// let clientId = ref<DialogueItem[]>([])
+// let consumerId = ref<DialogueItem[]>([])
+
 // 所有分类选项（也可以动态生成）
 let categoryOptions: any = []
 const dialogVisible = ref(false)
@@ -163,7 +169,7 @@ const getCate = async () => {
 }
 const handleSearch = async () => {
   // if(sendData.value.type === '') sendData.value.type = null
-  if (sendData.value.searchContent === '') sendData.value.searchContent = null
+  if (sendData.value.content === '') sendData.value.content = null
   try {
     const res = await getChatPage(sendData.value)
     rawChatData.value = res.records

@@ -16,8 +16,8 @@
         <div v-if="!isEmpty2" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
           <span style="font-size: 14px;">关键词高亮：</span>
           <el-switch v-model="isHighlight" width="80px" inline-prompt active-text="开启" inactive-text="关闭" />
-          <span style="font-size: 14px;">敏感词高亮：</span>
-          <el-switch v-model="isSensitive" width="80px" inline-prompt active-text="开启" inactive-text="关闭" />
+          <!-- <span style="font-size: 14px;">敏感词高亮：</span>
+          <el-switch v-model="isSensitive" width="80px" inline-prompt active-text="开启" inactive-text="关闭" /> -->
         </div>
 
         <el-scrollbar class="chat-scrollbar" v-if="!isEmpty">
@@ -51,7 +51,7 @@
     <div v-if="!isEmpty2" class="classify">
       <div class="classify-section">
         <span class="label">当前聊天记录分类：</span>
-        <el-tag type="primary" size="small">{{ currentMsg.role }}</el-tag>
+        <el-tag type="primary" size="small">{{ currentMsg.type }}</el-tag>
       </div>
       <div class="classify-section">
         <span class="label">高亮词汇：</span>
@@ -62,15 +62,15 @@
           </el-tag>
         </div>
       </div>
-      <div class="classify-section">
-        <span class="label">敏感词汇：</span>
-        <div class="sensitive-tags">
-          <el-tag v-for="(word, index) in sensitive" :key="index" type="success" size="small" effect="light"
-            class="sensitive-tag">
-            {{ word }}
-          </el-tag>
-        </div>
-      </div>
+      <!-- <div class="classify-section">
+          <span class="label">敏感词汇：</span>
+          <div class="sensitive-tags">
+            <el-tag v-for="(word, index) in sensitive" :key="index" type="success" size="small" effect="light"
+              class="sensitive-tag">
+              {{ word }}
+            </el-tag>
+          </div>
+        </div> -->
       <div class="classify-section">
         <span class="label">创建时间：</span>
         <span class="value">{{ formatDate(currentMsg.createTime || '') }}</span>
@@ -83,15 +83,12 @@
 
   </div>
 
-
 </template>
 
 
 <script lang='ts' setup name='ChatDetail'>
 import { ref, computed, toRefs, onMounted } from 'vue'
 import type { Chat } from '@/stores/types'
-
-
 
 const props = defineProps({
   rawDialogData: {
@@ -107,10 +104,8 @@ const props = defineProps({
 // 注意这里直接解构的话，返回的数据失去了响应性
 const { rawChatData, rawDialogData } = toRefs(props)
 
-// 原始数据
-
-const isHighlight = ref(true)
-const isSensitive = ref(true)
+const isHighlight = ref(false)
+const isSensitive = ref(false)
 const isEmpty = computed(() => chatList.value.length === 0)
 const isEmpty2 = computed(() => Object.keys(rawDialogData.value).length === 0)
 
@@ -124,38 +119,51 @@ const chatList = computed<Chat[]>(() =>
 )
 
 // 从 sensitiveReason 中提取敏感关键词（非 null 的）
-const sensitive = computed<string[]>(() =>
-  rawChatData.value.map(item => item.sensitiveReason).filter(reason => reason !== null) as string[]
-)
+// const sensitive = computed<string[]>(() =>
+//   rawChatData.value.map(item => item.sensitiveReason).filter(reason => reason !== null) as string[]
+// )
+const sensitive = ['e1']
 
 const highlight = computed(() => {
-  const word = rawDialogData.value.highlight
-  return word ? [word] : []
+  let word = rawDialogData.value.highlight
+  if (word) {
+    try {
+      word = JSON.parse(word)  // 转换成数组
+    } catch (e) {
+      // 如果不是标准 JSON 格式，就按逗号分割
+      word = word.split(',').map((w: any) => w.trim())
+    }
+    return Array.isArray(word) ? word : [word]
+  }
+  else return []
 })
 
-const currentMsg = ref({
-  type: '示例类型',
-  createTime: rawDialogData?.value.createTime || '',
-  editTime: rawDialogData?.value.editTime || ''
-}) as unknown as Chat
+// const currentMsg = ref({
+//   type: rawDialogData?.value.type || '',
+//   createTime: rawDialogData?.value.createTime || '',
+//   editTime: rawDialogData?.value.editTime || ''
+// }) as unknown as Chat
+const currentMsg = computed(() => {
+  return {
+    type: rawDialogData?.value.type || '',
+    createTime: rawDialogData?.value.createTime || '',
+    editTime: rawDialogData?.value.editTime || ''
+  }
+})
 
-
-// 高亮文本
+// // 高亮文本
 const highlightText = (text: string, sensitiveWords: string[], highlightWords: string[]) => {
   // 提取所有关键词，去重合并（包括敏感词和高亮词）
   const allWords = [...new Set([...sensitiveWords, ...highlightWords])]
-
   // 如果两个开关都关了，直接返回原文本
   if ((!isSensitive.value && !isHighlight.value) || allWords.length === 0) {
     return text
   }
-
   // 构造正则匹配
   const regex = new RegExp(
     allWords.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
     'g'
   )
-
   // 执行替换
   return text.replace(regex, (matched) => {
     const classList = []
@@ -169,6 +177,7 @@ const highlightText = (text: string, sensitiveWords: string[], highlightWords: s
   })
 }
 
+
 // 格式化日期
 const formatDate = (str: string) => {
   if (!str) return ''
@@ -178,9 +187,6 @@ const formatDate = (str: string) => {
 
 
 onMounted(() => {
-  // rawChatData.value = []
-
-
 })
 
 </script>
