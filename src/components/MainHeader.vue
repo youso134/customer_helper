@@ -84,7 +84,7 @@ onMounted(() => {
   padding: 0 24px;
   box-sizing: border-box;
 
-  background-color:#1f2c3a;
+  background-color:#3a4047;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 
@@ -94,14 +94,14 @@ onMounted(() => {
 
     .menu-btn {
       margin-right: 20px;
-      background-color: #33889b;
+      background-color: #e4e4e4;
       border: none;
-      color: #fff;
+      color: #3a4047;
       border-radius: 6px;
       transition: background 0.3s;
 
       &:hover {
-        background-color: #1e5a68;
+        background-color: #55575a;
       }
     }
 

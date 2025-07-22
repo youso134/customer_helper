@@ -1,12 +1,12 @@
 <template>
   <div class="app-container">
-    <div class="profile-card-wrapper" @click="toggleChart">
+    <div class="profile-card-wrapper">
       <el-card class="profile-card">
         <h1 class="page-title">个人信息中心</h1>
 
         <!-- 头像和 UID -->
         <div class="avatar-section column-layout">
-          <AvatarUpload v-model:avatarUrl="userInfo.avatar" :size="100" @click.stop/>
+          <AvatarUpload v-model:avatarUrl="userInfo.avatar" :size="100" @click.stop />
           <div class="basic-info">
             <p class="uid">UID:{{ userInfo.uid }}</p>
             <p class="role">身份: {{ userInfo.userRole }}</p>
@@ -37,10 +37,10 @@
 
           <p>
             <strong>出生年月：</strong>
-            <template v-if="!editMode">{{ userInfo.birthdate }}</template>
+            <template v-if="!editMode">{{ userInfo.birthDate }}</template>
             <template v-else>
               <el-date-picker
-                v-model="userInfo.birthdate"
+                v-model="userInfo.birthDate"
                 type="date"
                 value-format="YYYY-MM-DD"
                 placeholder="请选择日期"
@@ -94,30 +94,22 @@
           </template>
         </div>
       </el-card>
-
-      <!-- 饼图悬浮框 -->
-      <div class="chart-overlay" v-show="isChartVisible" @click.stop>
-        <div ref="chartRef" class="pie-chart"></div>
-      </div>
     </div>
 
     <!-- 修改密码弹窗 -->
     <PasswordDialog v-model="showPasswordDialog" @submit="handlePasswordChange" />
   </div>
 </template>
-
 <script setup>
-import { ref, watch, nextTick, onBeforeUnmount } from 'vue'
-import axios from 'axios'
-import * as echarts from 'echarts'
+import { ref } from 'vue'
 import { ElMessage, ElLoading } from 'element-plus'
 import { Edit, Check, Close, Lock } from '@element-plus/icons-vue'
 import { useUserProfile } from '@/components/useUserProfile'
 import AvatarUpload from '@/components/AvatarUpload.vue'
 import PasswordDialog from '@/components/PasswordDialog.vue'
-import { updateUser, getTypeCount } from '@/apis/userApi'
+import { updateUser } from '@/apis/userApi'
 
-const { 
+const {
   editMode,
   userInfo,
   enterEditMode,
@@ -126,91 +118,6 @@ const {
 } = useUserProfile()
 
 const showPasswordDialog = ref(false)
-const isChartVisible = ref(false)
-const chartRef = ref(null)
-let chartInstance = null
-
-const pieData = ref([])
-
-// 初始化 ECharts 饼图
-const initChart = () => {
-  if (!chartRef.value) return
-  chartInstance = echarts.init(chartRef.value)
-  chartInstance.setOption({
-    title: {
-      text: '客服类型',
-      left: 'center',
-      top: 10,
-      textStyle: { fontSize: 14 }
-    },
-    tooltip: { trigger: 'item' },
-    legend: {
-      bottom: 0,
-      left: 'center'
-    },
-    series: [
-      {
-        name: '类型',
-        type: 'pie',
-        radius: '50%',
-        data: pieData.value,
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.5)'
-          }
-        }
-      }
-    ]
-  })
-}
-
-watch(isChartVisible, (val) => {
-  if (!val && chartInstance) {
-    chartInstance.dispose()
-    chartInstance = null
-  }
-})
-
-onBeforeUnmount(() => {
-  chartInstance?.dispose()
-})
-
-// 点击卡片切换饼图
-const toggleChart = async () => {
-  if (isChartVisible.value) {
-    isChartVisible.value = false
-    return
-  }
-
-  try {
-    const res = await getTypeCount()
-    const rawData = res.data || res
-    if (rawData && typeof rawData === 'object') {
-      const chartData = Object.entries(rawData)
-        .filter(([_, value]) => value > 0)
-        .map(([name, value]) => ({ name, value }))
-
-      if (!chartData.length) {
-        ElMessage.warning('暂无可展示的数据')
-        return
-      }
-
-      pieData.value = chartData
-      isChartVisible.value = true
-      await nextTick()
-      initChart()
-    } else {
-      console.warn('接口结构异常:', res)
-      ElMessage.error('接口返回异常')
-    }
-  } catch (err) {
-    console.error('接口调用失败:', err)
-    ElMessage.error('获取类型统计失败: ' + err.message)
-  }
-}
-
 
 // 修改密码
 const handlePasswordChange = async ({ currentPassword, newPassword }) => {
@@ -239,9 +146,7 @@ const handlePasswordChange = async ({ currentPassword, newPassword }) => {
   }
 }
 </script>
-
 <style scoped lang="scss">
-/* 样式保持不变，与原贴相同 */
 .app-container {
   display: flex;
   justify-content: center;
@@ -253,7 +158,6 @@ const handlePasswordChange = async ({ currentPassword, newPassword }) => {
 .profile-card-wrapper {
   position: relative;
   display: inline-block;
-  cursor: pointer;
 }
 
 .profile-card {
@@ -271,25 +175,6 @@ const handlePasswordChange = async ({ currentPassword, newPassword }) => {
     transform: translateY(-5px);
     box-shadow: 0 12px 50px rgba(0, 0, 0, 0.15);
   }
-}
-
-.chart-overlay {
-  position: absolute;
-  top: 20px;
-  right: -260px;
-  width: 240px;
-  height: 240px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  padding: 10px;
-  z-index: 10;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.pie-chart {
-  width: 100%;
-  height: 100%;
 }
 
 .page-title {
@@ -413,11 +298,6 @@ const handlePasswordChange = async ({ currentPassword, newPassword }) => {
       text-align: left;
       margin-bottom: 5px;
     }
-  }
-
-  .chart-overlay {
-    position: static;
-    margin-top: 20px;
   }
 }
 </style>

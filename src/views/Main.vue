@@ -1,47 +1,36 @@
 <template>
   <div class="main-layout">
     <el-container>
-      <!-- 左边侧边栏 -->
       <MainAside />
 
-      <!-- 右侧 -->
       <el-container>
-        <!-- 顶部导航 -->
         <el-header>
           <MainHeader />
         </el-header>
 
-        <!-- 核心内容 -->
         <el-main>
-          <router-view></router-view>
+          <router-view />
+
+          <!--  仅在 /main 显示图表 -->
+          <ConsumerRankingTable v-if="isMainRoot" />
+          <TypePieChart v-if="isMainRoot" />
         </el-main>
       </el-container>
     </el-container>
   </div>
 </template>
 
-<script lang='ts' setup name='Main'>
-import { onMounted} from 'vue'
-import MainAside from '../components/MainAside.vue';
-import MainHeader from '../components/MainHeader.vue';
-// import { useRouter } from 'vue-router';
+<script setup lang="ts" name="Main">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import MainAside from '../components/MainAside.vue'
+import MainHeader from '../components/MainHeader.vue'
+import TypePieChart from '../components/TypePieChart.vue'
 
+const route = useRoute()
 
-onMounted(() => {
-  // const savedIndex = localStorage.getItem('activeMenuIndex')
-  // if (savedIndex === '2') {
-  //   router.push({ name: 'alldialoglog' })
-  // } else if (savedIndex === '3') {
-  //   router.push({ name: 'chatlog' })
-  // }
-
-  // let res = localStorage.getItem('user')
-  // if (res === null) {
-  //   ElMessage.error('没有登录记录，请返回登录。')
-  //   router.push('/login')
-  // }
-})
-
+//  当前完整路径是 "/main" 时才展示图表（不含任何子路径）
+const isMainRoot = computed(() => route.path === '/main')
 </script>
 
 <style scoped lang="scss">
@@ -58,10 +47,5 @@ onMounted(() => {
   .el-main {
     padding: 0;
   }
-
-  // .el-main{
-  //   height: 80%;
-  // }
-
 }
 </style>
